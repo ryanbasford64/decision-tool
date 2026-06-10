@@ -1414,9 +1414,13 @@
   }
 
   .income-chart .ic-header:first-child { text-align: left; }
-  .income-chart .ic-header:nth-child(n+3) { display: none; }
+  /* Mobile: cells self-label via ::before, so hide the header row entirely */
+  .income-chart .ic-header { display: none; }
 
   .income-chart .ic-age {
+    /* Mobile: age cell anchors col 1 and spans its three path rows */
+    grid-column: 1;
+    grid-row: span 3;
     padding: 14px 10px;
     border-bottom: 1px solid var(--hairline);
     border-right: 1px solid var(--hairline);
@@ -1444,6 +1448,8 @@
   }
 
   .income-chart .ic-bar {
+    /* Mobile: every path card stays in the wide column */
+    grid-column: 2;
     padding: 14px 14px 20px;
     border-bottom: 1px solid var(--hairline);
     border-right: none;
@@ -1880,8 +1886,9 @@
 
     /* Income chart: full four-column grid */
     .income-chart { grid-template-columns: 70px repeat(3, 1fr); }
-    .income-chart .ic-header:nth-child(n+3) { display: block; }
-    .income-chart .ic-bar { border-right: 1px solid var(--hairline); }
+    .income-chart .ic-header { display: block; }
+    .income-chart .ic-age { grid-column: auto; grid-row: auto; }
+    .income-chart .ic-bar { grid-column: auto; border-right: 1px solid var(--hairline); }
     .income-chart .ic-bar:nth-of-type(4n) { border-right: none; }
     .income-chart .ic-bar::before { display: none; }
 
