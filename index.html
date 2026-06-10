@@ -1,0 +1,4074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Three Paths — A Decision Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Base — near-black, cool */
+    --paper: #0b0e13;
+    --paper-deep: #11151c;
+    --paper-deeper: #161c25;
+    --paper-deepest: #1d2530;
+
+    /* Text */
+    --ink: #eef1f5;
+    --ink-soft: #a8b0bb;
+    --ink-faint: #69727e;
+
+    /* Path 1 — Green (Army) */
+    --army: #4ade80;
+    --army-soft: #2f9d57;
+    --army-tint: rgba(74,222,128,0.08);
+    --army-tint-deep: rgba(74,222,128,0.13);
+    --army-bar: #4ade80;
+
+    /* Path 2 — Blue (Navy) */
+    --navy: #38bdf8;
+    --navy-soft: #2492c4;
+    --navy-tint: rgba(56,189,248,0.08);
+    --navy-tint-deep: rgba(56,189,248,0.13);
+    --navy-bar: #38bdf8;
+
+    /* Path 3 — Bronze (Officer) */
+    --officer: #f0b429;
+    --officer-soft: #c08f1c;
+    --officer-tint: rgba(240,180,41,0.08);
+    --officer-tint-deep: rgba(240,180,41,0.13);
+    --officer-bar: #f0b429;
+
+    /* Accent — electric violet (kept legacy var names) */
+    --brass: #a78bfa;
+    --brass-deep: #7c5ce0;
+    --accent-tint: rgba(167,139,250,0.10);
+
+    --hairline: rgba(238,241,245,0.08);
+    --hairline-strong: rgba(238,241,245,0.16);
+
+    --radius: 14px;
+    --radius-sm: 10px;
+
+    --font-display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(167,139,250,0.10) 0%, transparent 60%),
+      radial-gradient(circle at 85% 70%, rgba(56,189,248,0.05) 0%, transparent 45%),
+      radial-gradient(circle at 10% 95%, rgba(240,180,41,0.04) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  ::selection { background: var(--brass); color: var(--paper); }
+
+  /* Mobile-first container */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 18px 72px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ========== HERO ========== */
+  .header {
+    padding: 24px 0 40px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+    margin-bottom: 18px;
+    padding: 7px 14px;
+    border: 1px solid rgba(167,139,250,0.35);
+    border-radius: 999px;
+    background: var(--accent-tint);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(44px, 11vw, 92px);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, var(--army), var(--navy) 50%, var(--officer));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .subtitle {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin-bottom: 28px;
+  }
+
+  .start-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+    background: linear-gradient(120deg, #c4b5fd, var(--brass) 60%, var(--brass-deep));
+    text-decoration: none;
+    padding: 16px 28px;
+    border-radius: 999px;
+    box-shadow: 0 8px 28px rgba(167,139,250,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .start-cta .cta-arrow { transition: transform 0.2s ease; font-size: 15px; }
+  .start-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(167,139,250,0.45), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .start-cta:hover .cta-arrow { transform: translateX(4px); }
+  .start-cta:active { transform: translateY(0) scale(0.98); }
+
+  /* ========== SECTIONS ========== */
+  section { margin-bottom: 64px; scroll-margin-top: 16px; }
+
+  .section-number {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 999px;
+    background: var(--accent-tint);
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 6vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  h2 em { font-style: normal; color: var(--brass); }
+
+  p.lede {
+    font-size: 16.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    max-width: 680px;
+  }
+
+  p {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+
+  p em { font-style: italic; color: var(--ink); }
+  strong { font-weight: 600; color: var(--ink); }
+
+  /* ============================================================
+     THE DUAL-MODE INTERACTIVE TOOL
+     ============================================================ */
+
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: var(--paper-deep);
+    border: 1px solid var(--hairline);
+    margin: 20px 0 14px;
+    border-radius: 999px;
+    padding: 6px;
+  }
+
+  .mode-btn {
+    background: transparent;
+    border: none;
+    padding: 12px 18px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--ink-faint);
+    transition: all 0.25s ease;
+    font-family: inherit;
+    position: relative;
+    border-radius: 999px;
+  }
+
+  .mode-btn:hover { color: var(--ink-soft); }
+
+  .mode-btn.active {
+    background: linear-gradient(120deg, rgba(167,139,250,0.22), rgba(124,92,224,0.16));
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px rgba(167,139,250,0.45), 0 2px 12px rgba(167,139,250,0.12);
+  }
+
+  .mode-btn .mode-label {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  .mode-btn .mode-sub {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+  }
+
+  .mode-btn.active .mode-label { color: var(--brass); }
+  .mode-btn.active .mode-sub { color: var(--ink-soft); }
+
+  .mode-panel {
+    display: none;
+    background: var(--paper-deep);
+    border: 1px solid var(--hairline);
+    padding: 18px 14px;
+    margin: 0 0 32px;
+    border-radius: var(--radius);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+  }
+
+  .mode-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  /* ========== SIMULATE MODE ========== */
+
+  /* HUD — all five stats visible on every screen size */
+  .hud {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    margin-bottom: 20px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .hud-cell {
+    padding: 12px 14px;
+    background: var(--paper-deeper);
+  }
+
+  .hud-cell.hud-age {
+    grid-row: span 2;
+    background: var(--paper-deepest);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hud-label {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .hud-value {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hud-cell.hud-age .hud-value {
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--brass);
+    text-shadow: 0 0 24px rgba(167,139,250,0.35);
+  }
+
+  /* Path strip — run progress */
+  .path-strip {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 22px;
+    height: 10px;
+  }
+
+  .path-strip-segment {
+    flex: 1;
+    background: var(--paper-deepest);
+    border-radius: 99px;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+  }
+
+  .path-strip-segment.filled.army { background: var(--army); box-shadow: 0 0 10px rgba(74,222,128,0.5); }
+  .path-strip-segment.filled.navy { background: var(--navy); box-shadow: 0 0 10px rgba(56,189,248,0.5); }
+  .path-strip-segment.filled.officer { background: var(--officer); box-shadow: 0 0 10px rgba(240,180,41,0.5); }
+
+  .path-strip-segment.current::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 2px solid var(--brass);
+    border-radius: 99px;
+    animation: pulse 1.4s ease infinite;
+  }
+
+  /* Scene card — the narrative */
+  .scene {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    min-height: 180px;
+    position: relative;
+    overflow: hidden;
+    animation: sceneIn 0.4s ease;
+  }
+
+  .scene::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--brass);
+    border-radius: 3px 3px 0 0;
+  }
+
+  @keyframes sceneIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .scene.army::before { background: linear-gradient(90deg, var(--army), transparent); }
+  .scene.navy::before { background: linear-gradient(90deg, var(--navy), transparent); }
+  .scene.officer::before { background: linear-gradient(90deg, var(--officer), transparent); }
+
+  .scene.army { background: linear-gradient(170deg, var(--army-tint), var(--paper) 45%); }
+  .scene.navy { background: linear-gradient(170deg, var(--navy-tint), var(--paper) 45%); }
+  .scene.officer { background: linear-gradient(170deg, var(--officer-tint), var(--paper) 45%); }
+
+  .scene-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .scene.army .scene-meta { color: var(--army); }
+  .scene.navy .scene-meta { color: var(--navy); }
+  .scene.officer .scene-meta { color: var(--officer); }
+
+  .scene-title {
+    font-family: var(--font-display);
+    font-size: 23px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    line-height: 1.15;
+  }
+
+  .scene-body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.62;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+
+  .scene-body p { font-size: 15px; margin-bottom: 12px; }
+  .scene-body p:last-child { margin-bottom: 0; }
+  .scene-body em { color: var(--ink); font-style: italic; }
+  .scene-body .fineprint { font-size: 12.5px; color: var(--ink-faint); }
+
+  .scene-stats {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .scene-stat {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: var(--paper-deeper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+  }
+
+  .scene-stat .key {
+    color: var(--ink-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 8.5px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .scene-stat .val {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* Choices */
+  .choices-prompt {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+    padding: 0 2px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .choices-prompt .prompt-label {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--brass);
+    font-weight: 700;
+  }
+
+  .choices-prompt .prompt-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .choice {
+    background: var(--paper-deeper);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius);
+    padding: 18px 48px 18px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    color: var(--ink);
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .choice::after {
+    content: '→';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    color: var(--brass);
+    transition: transform 0.2s ease, color 0.2s ease;
+    line-height: 1;
+  }
+
+  .choice:hover {
+    background: var(--paper-deepest);
+    border-color: var(--brass);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  }
+
+  .choice:hover::after { transform: translateY(-50%) translateX(4px); }
+
+  .choice:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+
+  .choice.army:hover { border-color: var(--army); box-shadow: 0 8px 26px rgba(74,222,128,0.15); }
+  .choice.army:hover::after { color: var(--army); }
+  .choice.navy:hover { border-color: var(--navy); box-shadow: 0 8px 26px rgba(56,189,248,0.15); }
+  .choice.navy:hover::after { color: var(--navy); }
+  .choice.officer:hover { border-color: var(--officer); box-shadow: 0 8px 26px rgba(240,180,41,0.15); }
+  .choice.officer:hover::after { color: var(--officer); }
+
+  .choice-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .choice.army .choice-label { color: var(--army); }
+  .choice.navy .choice-label { color: var(--navy); }
+  .choice.officer .choice-label { color: var(--officer); }
+
+  .choice-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .choice-detail {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  .choice-detail .consequence {
+    display: block;
+    margin-top: 7px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Start cards — big and inviting */
+  .choices.start { gap: 12px; }
+
+  .choices.start .choice {
+    padding: 22px 20px 50px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .choices.start .choice::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .choices.start .choice.army::before { background: var(--army); }
+  .choices.start .choice.navy::before { background: var(--navy); }
+  .choices.start .choice.officer::before { background: var(--officer); }
+
+  .choices.start .choice::after {
+    top: auto;
+    bottom: 16px;
+    right: 20px;
+    transform: none;
+  }
+
+  .choices.start .choice:hover::after { transform: translateX(4px); }
+
+  .choices.start .choice .choice-title {
+    font-size: 20px;
+    margin: 6px 0 10px;
+  }
+
+  .choices.start .choice .choice-detail {
+    font-size: 13.5px;
+    margin-top: auto;
+  }
+
+  /* Sim controls */
+  .sim-controls-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--hairline);
+  }
+
+  .ctrl-btn {
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink-soft);
+    padding: 11px 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--brass);
+    color: var(--brass);
+    background: var(--accent-tint);
+  }
+
+  /* Share modal */
+  .share-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(11, 14, 19, 0.85);
+    backdrop-filter: blur(6px);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .share-modal[style*="display: none"] { display: none !important; }
+
+  .share-modal-content {
+    background: var(--paper-deep);
+    border: 1px solid rgba(167,139,250,0.4);
+    border-radius: var(--radius);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    max-width: 540px;
+    width: 100%;
+    padding: 24px;
+  }
+
+  .share-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .share-modal-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .share-close {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    transition: color 0.15s ease;
+  }
+
+  .share-close:hover { color: var(--ink); }
+
+  .share-modal-blurb {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .share-text {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    padding: 14px 16px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 200px;
+    margin-bottom: 12px;
+    font-feature-settings: "tnum";
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .share-text:focus { outline: none; border-color: var(--brass); }
+
+  .share-copy-btn {
+    background: var(--brass);
+    color: var(--paper);
+    border: none;
+    padding: 12px 20px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.15s ease;
+    border-radius: 999px;
+    width: 100%;
+  }
+
+  .share-copy-btn:hover { background: var(--brass-deep); color: #fff; }
+
+  .share-copy-btn.copied { background: var(--army); color: var(--paper); }
+
+  /* ========== ANALYZE MODE ========== */
+
+  .term-header {
+    background: var(--paper-deepest);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    padding: 10px 14px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+  }
+
+  .term-bar { display: flex; align-items: center; gap: 8px; }
+
+  .term-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .term-title {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  .term-status { display: flex; gap: 16px; }
+
+  .term-stat {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .term-stat .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--army);
+    display: inline-block;
+  }
+
+  .term-stat .dot.live {
+    background: var(--army);
+    box-shadow: 0 0 8px rgba(74,222,128,0.7);
+    animation: pulse 1.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Ticker */
+  .ticker-tape {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    overflow: hidden;
+    padding: 9px 0;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .ticker-track {
+    display: flex;
+    gap: 40px;
+    white-space: nowrap;
+    animation: tickerScroll 40s linear infinite;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    padding-left: 20px;
+    width: max-content;
+  }
+
+  .ticker-track .tick-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ticker-track .tick-symbol { font-weight: 700; letter-spacing: 0.1em; }
+  .ticker-track .tick-symbol.army { color: var(--army); }
+  .ticker-track .tick-symbol.navy { color: var(--navy); }
+  .ticker-track .tick-symbol.officer { color: var(--officer); }
+  .ticker-track .tick-val { color: var(--ink); font-weight: 600; }
+  .ticker-track .tick-delta { color: var(--brass); font-size: 10px; }
+
+  @keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Income chart */
+  .analyze-chart {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 18px 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .chart-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .chart-legend { display: flex; gap: 14px; }
+
+  .legend-item {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .chart-svg-wrap svg { width: 100%; height: auto; display: block; }
+  .chart-svg-wrap circle { transition: r 0.2s ease; cursor: pointer; }
+  .chart-svg-wrap circle:hover { r: 7; }
+
+  /* Stats matrix — mobile-first: stacked path cards */
+  .stats-matrix {
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .matrix-header { display: none; }
+
+  .matrix-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    padding: 0;
+    overflow: hidden;
+    transition: background 0.15s ease;
+  }
+
+  .matrix-cell-label {
+    background: var(--paper-deepest);
+    border-bottom: 1px solid rgba(167,139,250,0.3);
+    padding: 11px 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+
+  .matrix-cell {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--hairline);
+    align-items: center;
+  }
+
+  .matrix-cell:last-child { border-bottom: none; }
+
+  .matrix-cell:nth-child(2)::before { content: 'GRN'; color: var(--army); }
+  .matrix-cell:nth-child(3)::before { content: 'BLU'; color: var(--navy); }
+  .matrix-cell:nth-child(4)::before { content: 'BRZ'; color: var(--officer); }
+
+  .matrix-cell::before {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+
+  .matrix-cell .num {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+
+  .matrix-cell .sub {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .bar-meter {
+    height: 6px;
+    background: var(--paper-deepest);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 6px;
+    position: relative;
+    width: 100%;
+  }
+
+  .bar-meter::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: var(--w, 50%);
+    background: linear-gradient(to right, var(--brass-deep), var(--brass));
+    border-radius: 99px;
+  }
+
+  .footnote-ref {
+    color: var(--brass);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    margin-left: 2px;
+    vertical-align: super;
+  }
+
+  .matrix-footnotes {
+    background: var(--paper-deepest);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-top: 8px;
+  }
+
+  .matrix-footnotes p {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .matrix-footnotes p:last-child { margin-bottom: 0; }
+
+  .matrix-footnotes sup {
+    color: var(--brass);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  .matrix-footnotes strong { color: var(--ink); }
+  .matrix-footnotes em { color: var(--ink); font-style: italic; }
+
+  /* End-of-run summary card */
+  .summary-card {
+    background:
+      linear-gradient(var(--paper), var(--paper)) padding-box,
+      linear-gradient(120deg, var(--army), var(--navy), var(--officer), var(--brass)) border-box;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    padding: 26px 22px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: summaryIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes summaryIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .summary-card::before {
+    content: '⦿ YOU AT 28';
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--brass);
+    font-weight: 700;
+  }
+
+  .summary-card .summary-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    line-height: 1.1;
+    padding-right: 80px;
+  }
+
+  .summary-card .summary-sub {
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .summary-stat .label {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .summary-stat .value {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 3px;
+  }
+
+  .summary-stat .extra {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.04em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+
+  .summary-reflection {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  .summary-reflection strong { color: var(--ink); }
+
+  /* ========== SECTION 2 — THREE LANES ========== */
+  .decisive {
+    margin: 40px 0 32px;
+    padding: 0;
+    border: none;
+  }
+
+  .decisive-intro {
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .decisive-intro .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .decisive-intro h3 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .decisive-intro h3 em { font-style: normal; color: var(--officer); }
+
+  .lanes {
+    position: relative;
+    padding-left: 26px;
+  }
+
+  .lanes::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 18px;
+    bottom: 36px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--ink), var(--army) 30%, var(--navy) 60%, var(--officer));
+    border-radius: 2px;
+    opacity: 0.5;
+  }
+
+  .lanes-origin {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .origin-dot {
+    position: absolute;
+    left: -26px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: 0 0 0 4px rgba(238,241,245,0.15);
+  }
+
+  .origin-label {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .origin-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .lane {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    margin-bottom: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .lane:hover { transform: translateX(4px); }
+
+  .lane::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 50%;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lane::after {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    width: 12px;
+    height: 2px;
+    opacity: 0.6;
+  }
+
+  .lane.army::before, .lane.army::after { background: var(--army); }
+  .lane.navy::before, .lane.navy::after { background: var(--navy); }
+  .lane.officer::before, .lane.officer::after { background: var(--officer); }
+
+  .lane.army::before { box-shadow: 0 0 12px rgba(74,222,128,0.6); }
+  .lane.navy::before { box-shadow: 0 0 12px rgba(56,189,248,0.6); }
+  .lane.officer::before { box-shadow: 0 0 12px rgba(240,180,41,0.6); }
+
+  .lane.army { border-color: rgba(74,222,128,0.25); background: linear-gradient(120deg, var(--army-tint), var(--paper) 55%); }
+  .lane.navy { border-color: rgba(56,189,248,0.25); background: linear-gradient(120deg, var(--navy-tint), var(--paper) 55%); }
+  .lane.officer { border-color: rgba(240,180,41,0.3); background: linear-gradient(120deg, var(--officer-tint), var(--paper) 55%); }
+
+  .lane-tag {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .lane.army .lane-tag { color: var(--army); }
+  .lane.navy .lane-tag { color: var(--navy); }
+  .lane.officer .lane-tag { color: var(--officer); }
+
+  .lane-figure {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 4px;
+  }
+
+  .lane-role {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .lane-note {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .lanes-caption {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 18px 0 0;
+    padding-left: 0;
+  }
+
+  .decisive-footnote {
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-top: 14px;
+    max-width: 720px;
+  }
+
+  /* ========== FINANCIAL ========== */
+  .fin-intro { margin-bottom: 24px; max-width: 720px; }
+
+  .fin-views {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    margin: 28px 0;
+  }
+
+  .fin-view-header {
+    border-bottom: 1px solid rgba(167,139,250,0.3);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+  }
+
+  .fin-view-header .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .fin-view-header h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .fin-view-header .blurb {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    margin: 0;
+  }
+
+  /* Paychecks grid — mobile-first 2-col with path labels */
+  .income-chart {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 0;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .income-chart .ic-header {
+    padding: 12px;
+    border-bottom: 1px solid rgba(167,139,250,0.3);
+    background: var(--paper-deeper);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .income-chart .ic-header:first-child { text-align: left; }
+  .income-chart .ic-header:nth-child(n+3) { display: none; }
+
+  .income-chart .ic-age {
+    padding: 14px 10px;
+    border-bottom: 1px solid var(--hairline);
+    border-right: 1px solid var(--hairline);
+    background: var(--paper-deep);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .income-chart .ic-age .age {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .income-chart .ic-age .year-label {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 3px;
+  }
+
+  .income-chart .ic-bar {
+    padding: 14px 14px 20px;
+    border-bottom: 1px solid var(--hairline);
+    border-right: none;
+    position: relative;
+    min-height: 78px;
+  }
+
+  .income-chart .ic-bar::before {
+    content: attr(data-col);
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+
+  .income-chart .ic-bar.army::before { color: var(--army); }
+  .income-chart .ic-bar.navy::before { color: var(--navy); }
+  .income-chart .ic-bar.officer::before { color: var(--officer); }
+
+  .income-chart .ic-bar.army { background: var(--army-tint); }
+  .income-chart .ic-bar.navy { background: var(--navy-tint); }
+  .income-chart .ic-bar.officer { background: var(--officer-tint); }
+
+  .income-chart .ic-bar .amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+
+  .income-chart .ic-bar .role {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .income-chart .ic-bar .note {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .income-chart .ic-bar .visual-bar {
+    position: absolute;
+    bottom: 8px;
+    left: 14px;
+    right: 14px;
+    height: 4px;
+    background: rgba(238,241,245,0.06);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .income-chart .ic-bar .visual-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: var(--bar-pct, 50%);
+    background: var(--bar-color);
+    border-radius: 99px;
+  }
+
+  .income-chart .ic-bar.army { --bar-color: var(--army); }
+  .income-chart .ic-bar.navy { --bar-color: var(--navy); }
+  .income-chart .ic-bar.officer { --bar-color: var(--officer); }
+
+  /* Post-28 cards */
+  .career-value {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .cv-card {
+    padding: 20px;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cv-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+  }
+
+  .cv-card.army::before { background: linear-gradient(90deg, var(--army), transparent); }
+  .cv-card.navy::before { background: linear-gradient(90deg, var(--navy), transparent); }
+  .cv-card.officer::before { background: linear-gradient(90deg, var(--officer), transparent); }
+
+  .cv-card .pd-header {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .cv-card.army .pd-header { color: var(--army); }
+  .cv-card.navy .pd-header { color: var(--navy); }
+  .cv-card.officer .pd-header { color: var(--officer); }
+
+  .cv-card h4 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .cv-card ul { list-style: none; padding: 0; margin: 0 0 14px 0; }
+
+  .cv-card li {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    padding: 5px 0 5px 16px;
+    position: relative;
+  }
+
+  .cv-card li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--brass);
+    font-weight: 700;
+  }
+
+  .cv-card .ceiling {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .cv-card .ceiling .label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+
+  .cv-card .ceiling .value {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  /* The honest takeaway */
+  .takeaway {
+    background: var(--paper-deep);
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .takeaway::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brass), transparent);
+  }
+
+  .takeaway h3 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--brass);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .takeaway p {
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .takeaway p:last-child { margin-bottom: 0; }
+
+  /* Tooltip definitions */
+  .def {
+    border-bottom: 1px dotted var(--brass);
+    cursor: help;
+    position: relative;
+  }
+
+  .def:hover::after {
+    content: attr(data-def);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper-deepest);
+    border: 1px solid var(--brass);
+    color: var(--ink);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-style: normal;
+    white-space: normal;
+    width: 240px;
+    line-height: 1.4;
+    z-index: 10;
+    margin-bottom: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .def:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--brass);
+    z-index: 10;
+    margin-bottom: -4px;
+  }
+
+  /* ========== QUESTIONS ========== */
+  .questions { counter-reset: q; margin-top: 24px; }
+
+  .question {
+    counter-increment: q;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .question::before {
+    content: counter(q, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--brass);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+
+  .question h4 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .question p {
+    font-size: 14px;
+    color: var(--ink-faint);
+    margin-bottom: 0;
+  }
+
+  /* ========== FOOTER ========== */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline-strong);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes fadeIn {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header, section { animation: rise 0.7s ease-out both; }
+  .header { animation-delay: 0.05s; }
+  section:nth-of-type(1) { animation-delay: 0.2s; }
+  section:nth-of-type(2) { animation-delay: 0.35s; }
+  section:nth-of-type(3) { animation-delay: 0.5s; }
+  section:nth-of-type(4) { animation-delay: 0.65s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ===========================================================
+     RESPONSIVE — progressive enhancement from mobile base
+     =========================================================== */
+
+  @media (min-width: 720px) {
+    .container { padding: 64px 40px 96px; }
+
+    .header { padding: 40px 0 56px; }
+
+    .mode-panel { padding: 32px 30px; }
+
+    .mode-btn { padding: 14px 24px; }
+
+    /* HUD: five across */
+    .hud { grid-template-columns: 96px 1fr 1fr 1.1fr 1.1fr; }
+    .hud-cell.hud-age { grid-row: auto; }
+    .hud-value { font-size: 17px; }
+
+    .scene { padding: 30px 32px; }
+    .scene-title { font-size: 27px; }
+
+    .choices.binary { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .choices.start { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .choices.start .choice { min-height: 230px; padding: 26px 22px 54px; }
+    .choices.start .choice .choice-title { font-size: 21px; }
+
+    .sim-controls-bar { flex-direction: row; justify-content: flex-end; gap: 12px; }
+    .ctrl-btn { width: auto; }
+    .share-copy-btn { width: auto; }
+
+    .summary-card { padding: 34px 36px; }
+    .summary-card .summary-title { font-size: 36px; }
+    .summary-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .summary-stat .value { font-size: 21px; }
+
+    .chart-header { flex-direction: row; justify-content: space-between; align-items: center; }
+    .analyze-chart { padding: 24px 28px; }
+
+    /* Matrix: full comparison table */
+    .stats-matrix {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+    }
+
+    .matrix-header {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      background: var(--paper-deepest);
+      border-bottom: 1px solid rgba(167,139,250,0.35);
+    }
+
+    .matrix-cell-header {
+      padding: 14px 18px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-weight: 700;
+      border-right: 1px solid var(--hairline);
+    }
+
+    .matrix-cell-header:last-child { border-right: none; }
+
+    .matrix-row {
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      border: none;
+      border-bottom: 1px solid var(--hairline);
+      border-radius: 0;
+      margin-bottom: 0;
+      background: transparent;
+    }
+
+    .matrix-row:last-child { border-bottom: none; }
+    .matrix-row:hover { background: var(--paper-deeper); }
+
+    .matrix-cell-label {
+      background: transparent;
+      border-bottom: none;
+      border-right: 1px solid var(--hairline);
+      padding: 16px 18px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .matrix-cell {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 16px 18px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .matrix-cell:last-child { border-right: none; }
+    .matrix-cell::before { display: none; }
+    .matrix-cell .num { font-size: 15px; margin-bottom: 3px; }
+    .matrix-cell .sub { font-size: 9.5px; }
+
+    .matrix-footnotes { padding: 18px 22px; margin-top: 10px; }
+
+    .ticker-track { font-size: 11px; gap: 48px; }
+
+    /* Income chart: full four-column grid */
+    .income-chart { grid-template-columns: 70px repeat(3, 1fr); }
+    .income-chart .ic-header:nth-child(n+3) { display: block; }
+    .income-chart .ic-bar { border-right: 1px solid var(--hairline); }
+    .income-chart .ic-bar:nth-of-type(4n) { border-right: none; }
+    .income-chart .ic-bar::before { display: none; }
+
+    .career-value { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .cv-card { padding: 24px; }
+
+    .takeaway { padding: 26px 30px; }
+
+    .question { grid-template-columns: 50px 1fr; gap: 20px; }
+    .question::before { padding-top: 3px; }
+
+    .lanes { padding-left: 34px; }
+    .lanes::before { left: 9px; }
+    .origin-dot { left: -32px; }
+    .lane::before { left: -29px; }
+    .lane::after { left: -18px; width: 18px; }
+    .lane { padding: 22px 24px 20px; }
+    .lane-figure { font-size: 36px; }
+
+    .decisive-intro h3 { font-size: 30px; }
+  }
+
+  @media (min-width: 960px) {
+    .scene-title { font-size: 28px; }
+    .term-title { display: inline; }
+  }
+
+  @media (max-width: 959px) {
+    .term-title { display: none; }
+  }
+
+  @media print {
+    .container { padding: 24px; max-width: 100%; }
+    section, .header { animation: none; page-break-inside: avoid; }
+    .mode-toggle { display: none; }
+    .sim-controls-bar { display: none; }
+    .choices { display: none; }
+    .start-cta { display: none; }
+    .mode-panel { display: block !important; border: 1px solid #ccc; padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="eyebrow">3 paths · 10 years · 1 decision</div>
+    <h1>Three <em>Paths</em></h1>
+    <p class="subtitle">Pick one. Live the next ten years one choice at a time. See who you are at 28.</p>
+    <a class="start-cta" href="#tool">Play your next 10 years <span class="cta-arrow">→</span></a>
+  </header>
+
+  <!-- ========== THE SIMULATOR + DATA VIEW ========== -->
+  <section id="tool">
+    <div class="section-number">01 · The Simulator</div>
+    <h2>Play the next ten years. <em>Or analyze them.</em></h2>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="simulate" id="btnSimulate">
+        <span class="mode-label">Simulate</span>
+        <span class="mode-sub">Make choices · live the path</span>
+      </button>
+      <button class="mode-btn" data-mode="analyze" id="btnAnalyze">
+        <span class="mode-label">Analyze</span>
+        <span class="mode-sub">Data view · all paths at once</span>
+      </button>
+    </div>
+
+    <!-- ============ SIMULATE MODE ============ -->
+    <div class="mode-panel active" id="modeSimulate">
+
+      <!-- HUD: shows current state -->
+      <div class="hud" id="hud">
+        <div class="hud-cell hud-age">
+          <div class="hud-label">Age</div>
+          <div class="hud-value" id="hudAge">17</div>
+        </div>
+        <div class="hud-cell">
+          <div class="hud-label">Status</div>
+          <div class="hud-value" id="hudStatus">Awaiting decision</div>
+        </div>
+        <div class="hud-cell">
+          <div class="hud-label">Path</div>
+          <div class="hud-value" id="hudPath">—</div>
+        </div>
+        <div class="hud-cell">
+          <div class="hud-label">Annual income</div>
+          <div class="hud-value" id="hudIncome">$0</div>
+        </div>
+        <div class="hud-cell">
+          <div class="hud-label">Cumulative</div>
+          <div class="hud-value" id="hudCumulative">$0</div>
+        </div>
+      </div>
+
+      <!-- Path indicator strip -->
+      <div class="path-strip" id="pathStrip"></div>
+
+      <!-- The narrative card area -->
+      <div class="scene" id="scene">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Decision area -->
+      <div class="choices-prompt" id="choicesPrompt" style="display: none;">
+        <span class="prompt-label">What's your move?</span>
+        <span class="prompt-hint">Tap a card to choose</span>
+      </div>
+      <div class="choices" id="choices">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Control bar (always visible after first choice) -->
+      <div class="sim-controls-bar" id="simControls" style="display: none;">
+        <button class="ctrl-btn" id="btnShare" style="display: none;">⇪ Share this outcome</button>
+        <button class="ctrl-btn" id="btnBack" style="display: none;">← Go back</button>
+        <button class="ctrl-btn" id="btnRestart">↺ Restart simulation</button>
+      </div>
+
+      <!-- Share modal -->
+      <div class="share-modal" id="shareModal" style="display: none;">
+        <div class="share-modal-content">
+          <div class="share-modal-header">
+            <span class="share-modal-title">Share this outcome</span>
+            <button class="share-close" id="shareClose">×</button>
+          </div>
+          <p class="share-modal-blurb">Copy this into a text message or email to share where you landed.</p>
+          <textarea class="share-text" id="shareText" readonly></textarea>
+          <button class="share-copy-btn" id="copySummary">Copy to clipboard</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ ANALYZE MODE ============ -->
+    <div class="mode-panel" id="modeAnalyze">
+
+      <!-- Terminal-style header -->
+      <div class="term-header">
+        <div class="term-bar">
+          <span class="term-dot" style="background: var(--army);"></span>
+          <span class="term-dot" style="background: var(--navy);"></span>
+          <span class="term-dot" style="background: var(--officer);"></span>
+          <span class="term-title">3PATH_ANALYZER · V12 · SAME DATA, BOTH MODES</span>
+        </div>
+        <div class="term-status">
+          <span class="term-stat"><span class="dot live"></span> LIVE</span>
+          <span class="term-stat" id="termTime"></span>
+        </div>
+      </div>
+
+      <!-- Ticker tape -->
+      <div class="ticker-tape">
+        <div class="ticker-track" id="tickerTrack"></div>
+      </div>
+
+      <!-- The income chart -->
+      <div class="analyze-chart">
+        <div class="chart-header">
+          <div class="chart-title">Annual income · ages 18 → 28</div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background: var(--army);"></span>Green</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--navy);"></span>Blue</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--officer);"></span>Bronze</span>
+          </div>
+        </div>
+        <div class="chart-svg-wrap">
+          <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" id="incomeChartSvg" role="img" aria-label="Income comparison chart">
+            <!-- Grid lines -->
+            <line x1="60" y1="40" x2="60" y2="280" stroke="rgba(238,241,245,0.15)" stroke-width="1"/>
+            <line x1="60" y1="280" x2="880" y2="280" stroke="rgba(238,241,245,0.15)" stroke-width="1"/>
+
+            <!-- Y-axis labels -->
+            <text x="50" y="46" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#69727e">$220K</text>
+            <text x="50" y="106" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#69727e">$165K</text>
+            <text x="50" y="166" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#69727e">$110K</text>
+            <text x="50" y="226" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#69727e">$55K</text>
+            <text x="50" y="284" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="#69727e">$0</text>
+
+            <!-- Horizontal gridlines -->
+            <line x1="60" y1="100" x2="880" y2="100" stroke="rgba(238,241,245,0.06)" stroke-width="1" stroke-dasharray="2 4"/>
+            <line x1="60" y1="160" x2="880" y2="160" stroke="rgba(238,241,245,0.06)" stroke-width="1" stroke-dasharray="2 4"/>
+            <line x1="60" y1="220" x2="880" y2="220" stroke="rgba(238,241,245,0.06)" stroke-width="1" stroke-dasharray="2 4"/>
+
+            <!-- Age labels along X-axis -->
+            <g id="ageAxis"></g>
+
+            <!-- Path lines populated by JS -->
+            <path id="lineArmy" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+            <path id="lineNavy" stroke="#38bdf8" stroke-width="2.5" fill="none"/>
+            <path id="lineOfficer" stroke="#f0b429" stroke-width="2.5" fill="none"/>
+
+            <!-- Path dots populated by JS -->
+            <g id="dotsArmy"></g>
+            <g id="dotsNavy"></g>
+            <g id="dotsOfficer"></g>
+
+            <!-- End labels at age 28 -->
+            <g id="endLabels"></g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Stats matrix -->
+      <div class="stats-matrix">
+        <div class="matrix-header">
+          <div class="matrix-cell-header">Dimension</div>
+          <div class="matrix-cell-header" style="color: var(--army);">Green</div>
+          <div class="matrix-cell-header" style="color: var(--navy);">Blue</div>
+          <div class="matrix-cell-header" style="color: var(--officer);">Bronze</div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Lifetime earnings by 28<sup class="footnote-ref">¹</sup></div>
+          <div class="matrix-cell"><span class="num">~$1.13M</span><span class="sub">11 yrs · sum of incomes</span></div>
+          <div class="matrix-cell"><span class="num">~$1.13M</span><span class="sub">11 yrs · sum of incomes</span></div>
+          <div class="matrix-cell"><span class="num">~$1.13M</span><span class="sub">officer drill premium offsets late start</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Income at 28<sup class="footnote-ref">²</sup></div>
+          <div class="matrix-cell"><span class="num">$180-210K</span><span class="sub">SJPD top-step</span></div>
+          <div class="matrix-cell"><span class="num">$180-210K</span><span class="sub">SJPD top-step</span></div>
+          <div class="matrix-cell"><span class="num">$188-218K</span><span class="sub">SJPD + Captain drill</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Final rank (military)</div>
+          <div class="matrix-cell"><span class="num">E-5 / E-6</span><span class="sub">Sergeant</span></div>
+          <div class="matrix-cell"><span class="num">E-5 / E-6</span><span class="sub">Petty Officer 2nd</span></div>
+          <div class="matrix-cell"><span class="num">O-3</span><span class="sub">Captain</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Civilian role at 28</div>
+          <div class="matrix-cell"><span class="num">SJPD officer</span><span class="sub">~6 yrs sworn</span></div>
+          <div class="matrix-cell"><span class="num">SJPD officer</span><span class="sub">~6 yrs sworn</span></div>
+          <div class="matrix-cell"><span class="num">SJPD officer</span><span class="sub">+ Reserve Captain</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Bachelor's degree by 22</div>
+          <div class="matrix-cell"><span class="num">Yes</span><span class="sub">if no deployment</span></div>
+          <div class="matrix-cell"><span class="num">Yes</span><span class="sub">if no deployment</span></div>
+          <div class="matrix-cell"><span class="num">Yes</span><span class="sub">degree-first design</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Security clearance</div>
+          <div class="matrix-cell"><span class="num">Secret</span><span class="sub">enlisted level</span></div>
+          <div class="matrix-cell"><span class="num">Secret</span><span class="sub">enlisted level</span></div>
+          <div class="matrix-cell"><span class="num">Secret / TS-eligible</span><span class="sub">officer level</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Federal LE eligible</div>
+          <div class="matrix-cell"><span class="num">Strong</span><span class="sub">vet + degree</span></div>
+          <div class="matrix-cell"><span class="num">Strong</span><span class="sub">vet + degree</span></div>
+          <div class="matrix-cell"><span class="num">Preferred</span><span class="sub">officer-vet profile</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Deployment exposure</div>
+          <div class="matrix-cell"><span class="num">Moderate</span><span class="sub">12B units deploy</span></div>
+          <div class="matrix-cell"><span class="num">Moderate</span><span class="sub">Seabees deploy regularly</span></div>
+          <div class="matrix-cell"><span class="num">Low–Moderate</span><span class="sub">officer leadership pool</span></div>
+        </div>
+
+        <div class="matrix-row">
+          <div class="matrix-cell-label">Optionality score<sup class="footnote-ref">³</sup></div>
+          <div class="matrix-cell"><div class="bar-meter" style="--w: 60%;"></div><span class="sub">Decent — vet + degree</span></div>
+          <div class="matrix-cell"><div class="bar-meter" style="--w: 60%;"></div><span class="sub">Decent — vet + degree</span></div>
+          <div class="matrix-cell"><div class="bar-meter" style="--w: 92%;"></div><span class="sub">Highest — officer-vet</span></div>
+        </div>
+
+      </div>
+
+      <!-- Provenance footnote -->
+      <div class="matrix-footnotes">
+        <p><sup>¹</sup> <strong>Lifetime earnings by 28</strong> is the sum of pre-tax annual income from age 18 through 28, using the default (non-deployment, SJPD-direct) path for each. Composition: training pay (18) + drill pay or ROTC stipend (19-21) + civilian career income + Reserve drill (22-28). Green and Blue are nearly identical because they converge on SJPD at 22. Bronze offsets four years of low income (ages 18-21 in college) with a small officer-drill premium starting at 22. The three totals being within $5K of each other is the honest takeaway: <em>by age 28, all three paths arrive at roughly the same cumulative earnings</em>. The differences are in rank, optionality, and ceiling — not in dollars to date.</p>
+        <p><sup>²</sup> <strong>Income at 28</strong> uses SJPD's published top-step officer pay band ($180-210K base, $188-218K with Reserve officer drill on Bronze). Verify current at the National Testing Network listing for SJPD.</p>
+        <p><sup>³</sup> <strong>Optionality score</strong> is a qualitative composite of clearance level, federal LE preference, civilian credential transferability, and exit destinations beyond LE (corporate, contracting, federal civilian). Not a precise metric — directional only.</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========== THE DECISIVE DIAGRAM ========== -->
+  <section>
+    <div class="section-number">02 · Where You Land</div>
+    <h2>One line, <em>three lives</em>.</h2>
+
+    <div class="decisive">
+      <div class="decisive-intro">
+        <div class="label">Same person · Same eleven years · Three outcomes</div>
+      </div>
+
+      <div class="lanes">
+        <div class="lanes-origin">
+          <span class="origin-dot"></span>
+          <div>
+            <div class="origin-label">You today</div>
+            <div class="origin-sub">Age 17 · one choice</div>
+          </div>
+        </div>
+
+        <div class="lane army">
+          <div class="lane-tag">Green · Army Reserve</div>
+          <div class="lane-figure">$180–210K</div>
+          <div class="lane-role">SJPD top-step officer · 6 years on the job, senior patrol</div>
+          <div class="lane-note">↳ on the job at 22</div>
+        </div>
+
+        <div class="lane navy">
+          <div class="lane-tag">Blue · Navy Reserve</div>
+          <div class="lane-figure">$180–210K</div>
+          <div class="lane-role">SJPD top-step officer · 6 years on the job, senior patrol</div>
+          <div class="lane-note">↳ on the job at 22</div>
+        </div>
+
+        <div class="lane officer">
+          <div class="lane-tag">Bronze · Reserve Commission</div>
+          <div class="lane-figure">$188–218K</div>
+          <div class="lane-role">SJPD top-step + Captain in the Reserve · same civilian pay, officer rank, more options</div>
+          <div class="lane-note">↳ commissions + SJPD at 22</div>
+        </div>
+
+        <p class="lanes-caption">All three paths can arrive at the same civilian destination. Bronze gets there with officer rank and more options.</p>
+      </div>
+
+    </div>
+
+    <div class="fin-intro">
+      <p style="font-size: 13.5px; color: var(--ink-faint); font-style: italic;">
+        Hover any underlined term for a plain-English definition. Numbers use
+        2026 federal pay tables and SJPD's published rates.
+      </p>
+    </div>
+
+    <div class="fin-views">
+
+      <!-- VIEW 1 -->
+      <div>
+        <div class="fin-view-header">
+          <div class="label">View One</div>
+          <h3>Year-by-year paychecks through age 28</h3>
+          <div class="blurb">Total annual income, including tax-free housing and food allowances where applicable.</div>
+        </div>
+
+        <div class="income-chart">
+          <div class="ic-header">Age</div>
+          <div class="ic-header" style="color: var(--army);">Green Path</div>
+          <div class="ic-header" style="color: var(--navy);">Blue Path</div>
+          <div class="ic-header" style="color: var(--officer);">Bronze Path</div>
+
+          <!-- AGE 22 -->
+          <div class="ic-age">
+            <span class="age">22</span>
+            <span class="year-label">Yr 5</span>
+          </div>
+          <div class="ic-bar army" data-col="Green Path" style="--bar-pct: 55%;">
+            <div class="amount">$113,500</div>
+            <div class="role">SJPD recruit, academy</div>
+            <div class="note">If hired · taxable</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar navy" data-col="Blue Path" style="--bar-pct: 55%;">
+            <div class="amount">$113,500</div>
+            <div class="role">SJPD recruit, academy</div>
+            <div class="note">If hired · taxable</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar officer" data-col="Bronze Path" style="--bar-pct: 58%;">
+            <div class="amount">$118,500</div>
+            <div class="role">SJPD recruit + 2LT drill</div>
+            <div class="note">Commissioned officer · same year</div>
+            <div class="visual-bar"></div>
+          </div>
+
+          <!-- AGE 23 -->
+          <div class="ic-age">
+            <span class="age">23</span>
+            <span class="year-label">Yr 6</span>
+          </div>
+          <div class="ic-bar army" data-col="Green Path" style="--bar-pct: 66%;">
+            <div class="amount">$137,000</div>
+            <div class="role">SJPD officer, step 1</div>
+            <div class="note">Off academy, on patrol</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar navy" data-col="Blue Path" style="--bar-pct: 66%;">
+            <div class="amount">$137,000</div>
+            <div class="role">SJPD officer, step 1</div>
+            <div class="note">Off academy, on patrol</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar officer" data-col="Bronze Path" style="--bar-pct: 69%;">
+            <div class="amount">$142,500</div>
+            <div class="role">SJPD step 1 + 2LT drill</div>
+            <div class="note">Off academy · officer drill pay</div>
+            <div class="visual-bar"></div>
+          </div>
+
+          <!-- AGE 25 -->
+          <div class="ic-age">
+            <span class="age">25</span>
+            <span class="year-label">Yr 8</span>
+          </div>
+          <div class="ic-bar army" data-col="Green Path" style="--bar-pct: 72%;">
+            <div class="amount">~$150,000</div>
+            <div class="role">SJPD officer, stepped up</div>
+            <div class="note">Plus overtime, typical</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar navy" data-col="Blue Path" style="--bar-pct: 72%;">
+            <div class="amount">~$150,000</div>
+            <div class="role">SJPD officer, stepped up</div>
+            <div class="note">Plus overtime, typical</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar officer" data-col="Bronze Path" style="--bar-pct: 76%;">
+            <div class="amount">~$158,000</div>
+            <div class="role">SJPD + Captain (O-3) drill</div>
+            <div class="note">Major promotion · O-3 drill rate</div>
+            <div class="visual-bar"></div>
+          </div>
+
+          <!-- AGE 28 -->
+          <div class="ic-age">
+            <span class="age">28</span>
+            <span class="year-label">Yr 11</span>
+          </div>
+          <div class="ic-bar army" data-col="Green Path" style="--bar-pct: 95%;">
+            <div class="amount">$180-210K</div>
+            <div class="role">Top-step SJPD officer</div>
+            <div class="note">7th and final pay step</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar navy" data-col="Blue Path" style="--bar-pct: 95%;">
+            <div class="amount">$180-210K</div>
+            <div class="role">Top-step SJPD officer</div>
+            <div class="note">7th and final pay step</div>
+            <div class="visual-bar"></div>
+          </div>
+          <div class="ic-bar officer" data-col="Bronze Path" style="--bar-pct: 100%;">
+            <div class="amount">$188-218K</div>
+            <div class="role">SJPD top-step + Captain</div>
+            <div class="note">Same as Green/Blue + officer drill</div>
+            <div class="visual-bar"></div>
+          </div>
+        </div>
+
+        <p style="font-size: 12.5px; color: var(--ink-faint); font-style: italic; margin-top: 12px;">
+          <strong style="color: var(--ink);">Note on the Bronze numbers.</strong> These figures assume the Reserve commission route — commission as a 2nd Lt and immediately apply to SJPD, drilling one weekend a month as a commissioned officer. <span class="def" data-def="Officer drill pay is meaningfully higher than enlisted drill pay. A 2nd Lt earns ~$430/drill period vs ~$250/period for a junior enlisted soldier. By the time you're a Captain (O-3), drill pay is ~$640/period.">Officer drill pay</span> is higher than enlisted drill, which is why Bronze edges ahead of Green/Blue by 28. The alternative — full active-duty commission — pays less year-by-year through 28 (~$80-141K total comp with housing allowance included), but unlocks a different ceiling: federal LE, defense contracting at $150-250K, and corporate roles. See View Two.
+        </p>
+      </div>
+
+      <!-- VIEW 2 -->
+      <div>
+        <div class="fin-view-header">
+          <div class="label">View Two</div>
+          <h3>What each path sets up after 28</h3>
+          <div class="blurb">Career ceiling, exit options, and the doors that are open to you at 30.</div>
+        </div>
+
+        <div class="career-value">
+
+          <div class="cv-card army">
+            <div class="pd-header">Green · at 28</div>
+            <h4>Senior patrol officer or new detective</h4>
+            <ul>
+              <li>Six years sworn experience at one PD</li>
+              <li>Specialty options: SWAT, K-9, detectives</li>
+              <li>Sergeant requires 5-7 more years typically</li>
+              <li>Reserve commitment continues to 20 yrs for pension</li>
+            </ul>
+            <div class="ceiling">
+              <div class="label">Likely peak by 40</div>
+              <div class="value">Sergeant / Lieutenant at one agency</div>
+            </div>
+          </div>
+
+          <div class="cv-card navy">
+            <div class="pd-header">Blue · at 28</div>
+            <h4>Senior patrol officer or new detective</h4>
+            <ul>
+              <li>Same outcomes as Green — career path identical once sworn</li>
+              <li>Different military experience profile (Navy vs Army)</li>
+              <li>Some agencies prefer Navy backgrounds for specific roles</li>
+              <li>Reserve commitment continues</li>
+            </ul>
+            <div class="ceiling">
+              <div class="label">Likely peak by 40</div>
+              <div class="value">Sergeant / Lieutenant at one agency</div>
+            </div>
+          </div>
+
+          <div class="cv-card officer">
+            <div class="pd-header">Bronze · at 28</div>
+            <h4>SJPD officer AND Captain in the Reserve</h4>
+            <ul>
+              <li>Same SJPD outcome as Green/Blue — six years sworn, top-step pay</li>
+              <li>BUT commissioned officer rank in the Reserve (Captain by 25)</li>
+              <li>Officer drill pay ~$8K/yr on top of SJPD income</li>
+              <li>Lead soldiers on drill weekends — enlisted peers report to you</li>
+              <li>Federal LE / corporate / contracting doors still open if you ever want them</li>
+            </ul>
+            <div class="ceiling">
+              <div class="label">Likely peak by 40</div>
+              <div class="value">Sergeant at SJPD + Major / LTC in the Reserve · or pivot to federal LE with a clearance</div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--hairline);">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--officer); font-weight: 600; margin-bottom: 6px;">Alternative · Active duty commission</div>
+              <p style="font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); margin: 0;">If you commission <em>active duty</em> instead of Reserve, the civilian career delays four years — but you separate as a Captain at 28 with a security clearance and federal LE eligibility. Lower pay through 28 (~$80-141K total), much higher ceiling after.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="takeaway">
+          <h3>The honest tradeoff</h3>
+          <p>
+            If you commission into the <strong>Reserves</strong>, the Bronze
+            Path arrives at the same civilian destination as Green and Blue
+            on the same timeline — same SJPD academy at 22, same top-step
+            paycheck at 28 — but with officer rank, higher drill pay, and
+            federal/corporate doors still open.
+          </p>
+          <p>
+            The trade is the four years of college plus ROTC instead of
+            enlisting at 18. You give up early enlisted experience and the
+            specific tradecraft of a 12B or Seabee. In exchange you get a
+            degree before starting the civilian career, an officer
+            commission, and the kind of optionality at 30 that very few
+            people your age will have.
+          </p>
+          <p>
+            <strong>If you commission active duty instead</strong>, the
+            civilian career delays four years. The ceiling after separation
+            is materially higher (federal LE, defense contracting at
+            $150-250K), but the SJPD-by-22 timeline is gone.
+          </p>
+          <p>
+            Which version is right depends on whether you want the civilian
+            badge as fast as possible, or want to lead soldiers as a
+            commissioned officer while building it.
+          </p>
+        </div>
+
+        <p style="font-size: 12.5px; color: var(--ink-faint); font-style: italic; margin-top: 14px;">
+          <strong style="color: var(--ink);">Numbers verified:</strong> 2026 federal pay tables (DFAS, Military.com), SJPD pay from official department posting via the National Testing Network. Verify yourself before signing: bonuses, current ROTC scholarship terms, GI Bill eligibility for your specific scenario.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== QUESTIONS ========== -->
+  <section>
+    <div class="section-number">03 · Before You Sign</div>
+    <h2>Six questions <em>worth asking</em>.</h2>
+    <p class="lede">
+      Ask these of every recruiter, and of yourself. If a recruiter pressures
+      you to sign before you've answered them, that's the answer.
+    </p>
+
+    <div class="questions">
+      <div class="question"><div>
+        <h4>Why am I drawn to enlist <em>now</em> rather than commission at 22?</h4>
+        <p>Is it the identity? The structure? Friends doing it? A specific recruiter? Be honest — the answer tells you which path fits.</p>
+      </div></div>
+
+      <div class="question"><div>
+        <h4>What does the career I want at 30 actually prefer?</h4>
+        <p>Whatever you're aiming at — police, federal LE, corporate, something else — call somebody doing it now. Ask: "What does your strongest applicant look like at 25?" The answer is free and specific.</p>
+      </div></div>
+
+      <div class="question"><div>
+        <h4>Am I optimizing for paychecks through 28, or for options after 28?</h4>
+        <p>That's the central trade in this document. Different answers point to different paths.</p>
+      </div></div>
+
+      <div class="question"><div>
+        <h4>What happens if my Reserve unit activates during junior year?</h4>
+        <p>Ask the recruiter. Ask SJSU's veteran services office. Plan for it — don't hope it doesn't happen.</p>
+      </div></div>
+
+      <div class="question"><div>
+        <h4>Which military job leaves me with the broadest set of civilian options?</h4>
+        <p>Combat Engineer teaches tactics and demolitions. Seabee teaches construction and small-unit ops. An officer commission teaches leadership at scale. They're different, not equivalent — and they open different doors.</p>
+      </div></div>
+
+      <div class="question"><div>
+        <h4>Have I actually visited a Navy recruiter?</h4>
+        <p>If not, that's a gap. Closing it costs you one afternoon.</p>
+      </div></div>
+    </div>
+
+    <!-- ========== CLOSE ========== -->
+    <div class="takeaway" style="margin-top: 36px;">
+      <h3>The decision is yours</h3>
+      <p>
+        Nobody should make this choice for you. But you owe it to the person
+        you'll be at 28 to make it <em>deliberately</em>, after talking to all
+        three branches and to someone working in the career you think you want.
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>Three Paths · v12</div>
+    <div>End of Document</div>
+  </footer>
+
+</div>
+
+
+<script>
+/* ========================================================================
+   THREE PATHS DECISION TOOL — Branching Simulator + Data View
+   ======================================================================== */
+
+/* ---------- DATA: PATH NODES ----------
+   Each node represents a scene at a given age on a given path.
+   Some nodes are "story" (no choice, just consequence).
+   Some nodes are "choice" (player picks; branches).
+   Nodes are keyed by id. State machine walks from node to node.
+*/
+
+const nodes = {
+
+  // ===== START =====
+  start: {
+    type: 'start',
+    age: 17,
+    meta: 'Summer after high school',
+    title: 'It\'s the summer after high school. What do you do?',
+    body: '<p>You\'re about to make the first major decision of your adult life. Three paths sit in front of you. Each has its own training, its own culture, its own version of your next ten years.</p><p>Pick one to start. You can restart and try a different path at any time.</p><p class="fineprint">Money figures use one real career — San Jose PD — so the trade-offs are concrete. The framework holds for whatever you end up wanting to do.</p>',
+    choices: [
+      {
+        path: 'army',
+        label: 'The Green Path',
+        title: 'Enlist · Army Reserve Combat Engineer',
+        detail: 'Ship to Fort Leonard Wood. Basic + 12B school combined, ~14 weeks. Then SJSU + drill weekends.',
+        consequence: 'You sign at MEPS. Ship date: late summer.',
+        next: 'army_18'
+      },
+      {
+        path: 'navy',
+        label: 'The Blue Path',
+        title: 'Enlist · Navy Reserve Seabee',
+        detail: 'Ship to Great Lakes for boot camp. Then Seabee school, then SJSU + local drill.',
+        consequence: 'You sign with the Navy recruiter. Ship date: late summer.',
+        next: 'navy_18'
+      },
+      {
+        path: 'officer',
+        label: 'The Bronze Path',
+        title: 'Begin SJSU + Army ROTC',
+        detail: 'Full-time student. Four years of leadership development. Commission at graduation as a Reserve officer.',
+        consequence: 'You enroll at SJSU and contract with ROTC for a Reserve commission track.',
+        next: 'officer_18'
+      }
+    ]
+  },
+
+  // ============================================
+  // GREEN PATH (ARMY RESERVE 12B)
+  // ============================================
+  army_18: {
+    type: 'story',
+    path: 'army',
+    age: 18,
+    status: 'Training',
+    meta: 'Fort Leonard Wood, Missouri',
+    title: 'Basic, then combat engineer school',
+    body: '<p>You ship in late summer. Basic Combat Training is brutal — three months of being broken down and rebuilt. Then 12B AIT (Advanced Individual Training): demolitions, breaching, route clearance. You learn how to blow things up properly.</p><p>By Christmas you\'re home. You\'re an E-3 (Private First Class), $5,500 in your pocket from training pay. Six months out of high school and you have a security clearance.</p>',
+    income: 5500,
+    stats: [
+      { key: 'Rank', val: 'E-3 (PFC)' },
+      { key: 'Status', val: 'Cleared' },
+      { key: 'Training', val: 'Complete' }
+    ],
+    nextLabel: 'Start at SJSU →',
+    next: 'army_19'
+  },
+
+  army_19: {
+    type: 'story',
+    path: 'army',
+    age: 19,
+    status: 'School + Drill',
+    meta: 'San Jose State, freshman year',
+    title: 'SJSU + one weekend a month',
+    body: '<p>You start at SJSU in the spring. Classes Monday through Friday, drill at the Sunnyvale Reserve Center one weekend a month, two weeks of annual training in the summer. The GI Bill (Selected Reserve flavor) kicks in about $485/month toward tuition.</p><p>It\'s manageable. You miss a few parties. Most people don\'t know you\'re a soldier.</p>',
+    income: 4500,
+    stats: [
+      { key: 'Rank', val: 'E-3' },
+      { key: 'School', val: 'Freshman' },
+      { key: 'Drill pay', val: '$4,500/yr' }
+    ],
+    nextLabel: 'Sophomore year →',
+    next: 'army_20'
+  },
+
+  army_20: {
+    type: 'choice',
+    path: 'army',
+    age: 20,
+    status: 'Decision Point',
+    meta: 'Sophomore year · September',
+    title: 'Your unit is being activated.',
+    body: '<p>Your battalion just got orders. Nine-month deployment to Eastern Europe — rotational support mission. You report in 60 days.</p><p>You have options. None of them are easy.</p>',
+    choices: [
+      {
+        label: 'Deploy with the unit',
+        title: 'Defer school. Go.',
+        detail: 'You drop the semester. Your GPA freezes. You come back at 21 with combat-zone pay, deployment under your belt, and a year of life experience your classmates don\'t have.',
+        consequence: '+$45K combat-zone pay · school delayed 1 year',
+        next: 'army_21_deployed'
+      },
+      {
+        label: 'Hardship deferment',
+        title: 'Apply to stay back.',
+        detail: 'School-based hardship deferment is allowed but rarely granted for a sophomore. Even if granted, your unit knows. Promotion politics may follow you.',
+        consequence: 'Stay in school · possible reputational cost',
+        next: 'army_21_stayed'
+      }
+    ]
+  },
+
+  army_21_deployed: {
+    type: 'story',
+    path: 'army',
+    age: 21,
+    status: 'Just back',
+    meta: 'September · post-deployment',
+    title: 'Home from the deployment',
+    body: '<p>You spent nine months in Poland and Romania, supporting rotational forces. You promoted to E-4 (Specialist) early because the deployment counted toward time-in-grade. You came home with $45K in tax-advantaged pay sitting in savings.</p><p>You\'re back at SJSU — now a sophomore at 21. Your friends are juniors. You don\'t mind.</p>',
+    income: 45000,
+    stats: [
+      { key: 'Rank', val: 'E-4 (SPC)' },
+      { key: 'Deployment', val: '9 mos · complete' },
+      { key: 'Savings', val: '~$45K' }
+    ],
+    nextLabel: 'Continue at SJSU →',
+    next: 'army_22_late'
+  },
+
+  army_21_stayed: {
+    type: 'story',
+    path: 'army',
+    age: 21,
+    status: 'School + Drill',
+    meta: 'Junior year',
+    title: 'On track at SJSU',
+    body: '<p>The hardship deferment came through. Your unit deployed without you. You drilled with a rear-detachment cell for nine months — paperwork, ceremonies, equipment accountability. Nothing glamorous.</p><p>You\'re a junior now, on track to graduate at 22. Your unit returns next year.</p>',
+    income: 5000,
+    stats: [
+      { key: 'Rank', val: 'E-3 (no promotion)' },
+      { key: 'School', val: 'Junior · on track' },
+      { key: 'Drill pay', val: '$5,000/yr' }
+    ],
+    nextLabel: 'Senior year →',
+    next: 'army_22_ontrack'
+  },
+
+  army_22_ontrack: {
+    type: 'choice',
+    path: 'army',
+    age: 22,
+    status: 'Graduation Year',
+    meta: 'Spring · senior year',
+    title: 'You\'re graduating. What\'s next?',
+    body: '<p>You walk in May. You\'re an E-4 by now, with a bachelor\'s degree and four years of Reserve service. Applications go out.</p>',
+    choices: [
+      {
+        label: 'Apply to SJPD',
+        title: 'San Jose Police Department',
+        detail: 'Top-paying agency in the region. Recruit pay is $113,500 during the academy. If hired, you start in fall.',
+        consequence: 'If hired: $113.5K + drill = ~$118K this year',
+        next: 'army_22_sjpd'
+      },
+      {
+        label: 'Apply to federal LE',
+        title: 'FBI / Secret Service / ATF',
+        detail: 'Application cycles take 12-18 months. Vet + degree + clearance is a strong profile but you\'ll start at GS-7/9, around $60-75K, with much higher upside.',
+        consequence: 'Delayed start · federal trajectory',
+        next: 'army_22_fed'
+      }
+    ]
+  },
+
+  army_22_late: {
+    type: 'story',
+    path: 'army',
+    age: 22,
+    status: 'Late junior',
+    meta: 'Spring · still in school',
+    title: 'A year behind, but rich in experience',
+    body: '<p>You\'re a year behind your friends academically but a year ahead in life. Junior at 22. You\'ll graduate at 23. The deployment changed you — and changed how recruiters see you.</p>',
+    income: 5500,
+    stats: [
+      { key: 'Rank', val: 'E-4 (SPC)' },
+      { key: 'School', val: 'Junior at 22' },
+      { key: 'Savings', val: '~$45K from deploy' }
+    ],
+    nextLabel: 'Push through →',
+    next: 'army_23_late_graduate'
+  },
+
+  army_23_late_graduate: {
+    type: 'story',
+    path: 'army',
+    age: 23,
+    status: 'Just graduated',
+    meta: 'May · graduation',
+    title: 'Degree in hand at 23',
+    body: '<p>You graduate a year later than your peers. SJPD application is in. Your deployment record actually moved your application to the top of the pile — agencies love vets with operational experience.</p>',
+    income: 5500,
+    stats: [
+      { key: 'Rank', val: 'E-4' },
+      { key: 'Degree', val: 'BA/BS · complete' },
+      { key: 'Status', val: 'SJPD candidate' }
+    ],
+    nextLabel: 'Apply to SJPD →',
+    next: 'army_23_sjpd_academy'
+  },
+
+  army_22_sjpd: {
+    type: 'story',
+    path: 'army',
+    age: 22,
+    status: 'SJPD academy',
+    meta: 'Fall · academy',
+    title: 'You\'re hired. Academy starts in fall.',
+    body: '<p>San Jose PD called. Background check cleared in 8 weeks (your existing military clearance accelerated it). You start the academy in September.</p><p>26 weeks of intense training. You\'re paid $113,500 during the academy — most agencies pay $60-70K for this. Plus your Reserve drill pay on the side.</p>',
+    income: 118000,
+    stats: [
+      { key: 'Job', val: 'SJPD recruit' },
+      { key: 'Annual', val: '$118K' },
+      { key: 'Rank', val: 'E-4 Reserve' }
+    ],
+    nextLabel: 'Off the academy →',
+    next: 'army_23_sjpd'
+  },
+
+  army_22_fed: {
+    type: 'story',
+    path: 'army',
+    age: 22,
+    status: 'Federal applicant',
+    meta: 'Application year',
+    title: 'The federal process is slow',
+    body: '<p>You apply to FBI Phase I testing. It\'s a 12-month process at minimum: written exam, panel interview, background investigation, polygraph, medical, fitness. You take a $60K civilian job at a defense contractor to bridge the gap.</p>',
+    income: 65000,
+    stats: [
+      { key: 'Status', val: 'FBI applicant' },
+      { key: 'Bridge job', val: 'Contractor · $60K' },
+      { key: 'Reserve', val: 'Still drilling' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'army_23_fed'
+  },
+
+  army_23_sjpd_academy: {
+    type: 'story',
+    path: 'army',
+    age: 23,
+    status: 'SJPD academy',
+    meta: 'Fall · academy',
+    title: 'Hired at SJPD',
+    body: '<p>You start the academy at 23. Late but exceptional applicant. Your $118K year matches your peers; you just got here a year later.</p>',
+    income: 118000,
+    stats: [
+      { key: 'Job', val: 'SJPD recruit' },
+      { key: 'Annual', val: '$118K' },
+      { key: 'Rank', val: 'E-4 Reserve' }
+    ],
+    nextLabel: 'Off the academy →',
+    next: 'army_24_sjpd'
+  },
+
+  army_23_sjpd: {
+    type: 'story',
+    path: 'army',
+    age: 23,
+    status: 'SJPD patrol',
+    meta: 'On the street',
+    title: 'Patrol officer · year one',
+    body: '<p>Off the academy. On the street. Field Training Officer in the right seat for three months, then you\'re on your own. Probationary year. You\'re also still drilling — Reserve weekends mean less sleep but more identity.</p>',
+    income: 142000,
+    stats: [
+      { key: 'SJPD', val: 'Step 1 · $137K' },
+      { key: 'Reserve drill', val: '+$5K' },
+      { key: 'Rank', val: 'E-5 promotable' }
+    ],
+    nextLabel: 'Year on the job →',
+    next: 'army_25_sjpd'
+  },
+
+  army_23_fed: {
+    type: 'story',
+    path: 'army',
+    age: 23,
+    status: 'Federal applicant',
+    meta: 'Still in process',
+    title: 'The wait continues',
+    body: '<p>The federal process drags. Your background investigation is still open. You\'ve done the polygraph twice. Your contractor job is fine — boring but pays. You\'re an E-5 in the Reserves now.</p>',
+    income: 70000,
+    stats: [
+      { key: 'Status', val: 'Background open' },
+      { key: 'Reserve', val: 'E-5 (SGT)' },
+      { key: 'Income', val: '$70K + drill' }
+    ],
+    nextLabel: 'Year passes →',
+    next: 'army_25_fed'
+  },
+
+  army_24_sjpd: {
+    type: 'story',
+    path: 'army',
+    age: 24,
+    status: 'SJPD patrol',
+    meta: 'Year 2',
+    title: 'Off probation. Specialty units open.',
+    body: '<p>You finish your probationary year. SWAT, K-9, motors — you can test for any specialty unit now. You\'re a Sergeant (E-5) in the Reserves. Two careers, one life.</p>',
+    income: 147000,
+    stats: [
+      { key: 'SJPD', val: 'Step 2 · $142K' },
+      { key: 'Reserve', val: 'E-5 (SGT)' },
+      { key: 'Specialty', val: 'Eligible' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'army_25_sjpd'
+  },
+
+  army_25_sjpd: {
+    type: 'choice',
+    path: 'army',
+    age: 25,
+    status: 'Decision point',
+    meta: 'Three years on the job',
+    title: 'A federal recruiter reaches out.',
+    body: '<p>Your name surfaced. An FBI recruiter in San Francisco wants to talk. Your profile — SJPD patrol, combat vet, clearance, degree — is exactly what they\'re looking for. Quantico starts in eight months.</p><p>You don\'t have to leave SJPD. But you could.</p>',
+    choices: [
+      {
+        label: 'Stay at SJPD',
+        title: 'Build the civilian career.',
+        detail: 'Test for detective in two years. Sergeant eligible in five. Pension at 25 years of service. Top-step pay by 28.',
+        consequence: 'Stable trajectory · ceiling at sergeant/lieutenant',
+        next: 'army_28_sjpd'
+      },
+      {
+        label: 'Take the FBI interview',
+        title: 'Make the call.',
+        detail: 'You can interview without committing. If you get the offer, you decide then. Most agents who come from PDs do this — testing the federal water without burning bridges.',
+        consequence: 'Optionality preserved',
+        next: 'army_28_fed_interview'
+      }
+    ]
+  },
+
+  army_25_fed: {
+    type: 'story',
+    path: 'army',
+    age: 25,
+    status: 'FBI offer',
+    meta: 'Quantico starts in 6 months',
+    title: 'The offer finally came',
+    body: '<p>Three years of patience. Your FBI offer arrived. GS-10, $72K to start, plus 25% LEAP availability pay. Quantico in six months.</p><p>You said yes.</p>',
+    income: 90000,
+    stats: [
+      { key: 'Status', val: 'FBI Special Agent' },
+      { key: 'Grade', val: 'GS-10' },
+      { key: 'Pay', val: '$90K + locality' }
+    ],
+    nextLabel: 'Continue to 28 →',
+    next: 'army_28_fed_direct'
+  },
+
+  army_28_sjpd: {
+    type: 'endpoint',
+    path: 'army',
+    age: 28,
+    status: 'Complete · SJPD',
+    meta: 'You at 28',
+    title: 'Top-step SJPD officer + E-6 Reserve',
+    summary: {
+      role: 'SJPD Police Officer · Step 7 (top step)',
+      income: '$180,000 — $210,000',
+      rank: 'E-6 (SSG) · Army Reserve',
+      degree: 'Bachelor\'s · 6 years ago',
+      ceiling: 'Detective track · sergeant test eligible at 30'
+    },
+    reflection: '<p>You took the path you started. <strong>Six years sworn at SJPD. E-6 in the Reserve.</strong> Top-step pay. You know the streets. You know your battle buddies. You\'re married, or close to it. Your $45K from the deployment paid for the down payment on a house in Willow Glen.</p><p>The federal recruiter\'s number is still in your phone. You haven\'t called.</p>'
+  },
+
+  army_28_fed_interview: {
+    type: 'endpoint',
+    path: 'army',
+    age: 28,
+    status: 'Complete · Hybrid',
+    meta: 'You at 28',
+    title: 'FBI Special Agent + Army Reserve E-6',
+    summary: {
+      role: 'FBI Special Agent · 18 months in',
+      income: '$110,000 — $130,000',
+      rank: 'E-6 (SSG) · Army Reserve',
+      degree: 'Bachelor\'s · 6 years ago',
+      ceiling: 'Federal career · GS-13/14 by 35'
+    },
+    reflection: '<p>You took the interview. You got the offer. You spent three years at SJPD, then made the jump to FBI at 26. Quantico almost killed you. The first field office assignment was in Phoenix.</p><p><strong>You\'re a federal agent. You took the longer trajectory.</strong> The pay\'s lower than SJPD right now, but in five years you\'ll outpace your old patrol partners. And you can come back to local LE anytime as a chief or commander.</p>'
+  },
+
+  army_28_fed_direct: {
+    type: 'endpoint',
+    path: 'army',
+    age: 28,
+    status: 'Complete · Federal',
+    meta: 'You at 28',
+    title: 'FBI Special Agent · 3 years in',
+    summary: {
+      role: 'FBI Special Agent · 3 yrs',
+      income: '$120,000 — $140,000',
+      rank: 'E-5/E-6 · Army Reserve',
+      degree: 'Bachelor\'s · 6 years ago',
+      ceiling: 'GS-13 promotable · field supervisor track'
+    },
+    reflection: '<p>You waited. You bridged with the contractor job. The FBI process took two years longer than the SJPD application would have.</p><p><strong>But you\'re a federal agent.</strong> Field office in Sacramento. You handle cases SJPD will never see. Your peers at SJPD are making more this year, but they\'ll plateau. You won\'t.</p>'
+  },
+
+  // ============================================
+  // BLUE PATH (NAVY RESERVE SEABEE)
+  // ============================================
+  navy_18: {
+    type: 'story',
+    path: 'navy',
+    age: 18,
+    status: 'Training',
+    meta: 'Great Lakes, Illinois',
+    title: 'Boot camp + Seabee school',
+    body: '<p>You ship to Great Lakes for boot camp — 10 weeks of Navy basic training. Different culture than the Army: tighter, smaller units, more emphasis on technical schools. Then Seabee A-school (Builder, Equipment Operator, or Construction Mechanic depending on your contract).</p><p>You\'re home before next summer. E-3 (Seaman). $7,000 in training pay. Clearance pending.</p>',
+    income: 7000,
+    stats: [
+      { key: 'Rank', val: 'E-3 (Seaman)' },
+      { key: 'Rating', val: 'BU / EO / CM' },
+      { key: 'Status', val: 'Trained' }
+    ],
+    nextLabel: 'Start at SJSU →',
+    next: 'navy_19'
+  },
+
+  navy_19: {
+    type: 'story',
+    path: 'navy',
+    age: 19,
+    status: 'School + Drill',
+    meta: 'SJSU freshman',
+    title: 'Drilling with a Seabee unit',
+    body: '<p>You drill at the Navy Operational Support Center in Alameda — once a month, plus two weeks of annual training. Your unit is part of a Naval Mobile Construction Battalion. Seabees build forward and fight when they need to.</p><p>Different rhythm than the Army Reserves. Smaller community. Tighter bonds.</p>',
+    income: 4500,
+    stats: [
+      { key: 'Rank', val: 'E-3' },
+      { key: 'School', val: 'Freshman' },
+      { key: 'Unit', val: 'NMCB' }
+    ],
+    nextLabel: 'Sophomore year →',
+    next: 'navy_20'
+  },
+
+  navy_20: {
+    type: 'choice',
+    path: 'navy',
+    age: 20,
+    status: 'Decision Point',
+    meta: 'Sophomore year · spring',
+    title: 'Battalion is being activated.',
+    body: '<p>Your NMCB is mobilizing. Construction mission overseas — building forward operating infrastructure. 8-month deployment. Report in 90 days.</p>',
+    choices: [
+      {
+        label: 'Deploy',
+        title: 'Mobilize with the battalion.',
+        detail: 'You pause school. You come back with deployment pay, a different worldview, and (if you want) advancement points toward E-5.',
+        consequence: '+$40K · 8 months · school delay',
+        next: 'navy_21_deployed'
+      },
+      {
+        label: 'Cross-rate to a non-deploying unit',
+        title: 'Request transfer.',
+        detail: 'There are NAVRES units that don\'t mobilize as often. Less prestige, less deployment exposure. Some Seabees consider this selling out.',
+        consequence: 'Stay in school · lower-tempo unit',
+        next: 'navy_21_stayed'
+      }
+    ]
+  },
+
+  navy_21_deployed: {
+    type: 'story',
+    path: 'navy',
+    age: 21,
+    status: 'Back from deployment',
+    meta: 'Just returned',
+    title: 'Eight months overseas',
+    body: '<p>You built a forward base. Concrete pads, hangars, fuel infrastructure. You worked 12-hour days for 8 straight months. You earned $40K in tax-advantaged pay and promoted early to E-4 (Petty Officer 3rd Class).</p>',
+    income: 40000,
+    stats: [
+      { key: 'Rank', val: 'E-4 (PO3)' },
+      { key: 'Deployment', val: '8 mos · complete' },
+      { key: 'Savings', val: '~$40K' }
+    ],
+    nextLabel: 'Back to SJSU →',
+    next: 'navy_22_late'
+  },
+
+  navy_21_stayed: {
+    type: 'story',
+    path: 'navy',
+    age: 21,
+    status: 'On track',
+    meta: 'Junior year',
+    title: 'SJSU junior',
+    body: '<p>Transfer approved. Your new unit drills at the same NOSC but doesn\'t mobilize. You make junior on schedule. Some of the senior Seabees in your old unit don\'t look at you the same. You learn to live with it.</p>',
+    income: 5000,
+    stats: [
+      { key: 'Rank', val: 'E-3' },
+      { key: 'School', val: 'Junior · on track' },
+      { key: 'Unit', val: 'Low-tempo NAVRES' }
+    ],
+    nextLabel: 'Senior year →',
+    next: 'navy_22_ontrack'
+  },
+
+  navy_22_ontrack: {
+    type: 'choice',
+    path: 'navy',
+    age: 22,
+    status: 'Graduation Year',
+    meta: 'Spring · senior year',
+    title: 'You graduate. Where do you apply?',
+    body: '<p>Bachelor\'s in hand. Reserve service continues. Job applications go out.</p>',
+    choices: [
+      {
+        label: 'SJPD',
+        title: 'Local police department',
+        detail: 'Apply to San Jose PD. Recruit pay $113,500. Top-paying agency in California.',
+        consequence: 'If hired: $113.5K + drill',
+        next: 'navy_22_sjpd'
+      },
+      {
+        label: 'Construction industry',
+        title: 'Your Seabee skills directly transfer.',
+        detail: 'Project Manager track at a commercial construction firm. Starting around $75-85K with rapid growth. Your military construction credentials accelerate you.',
+        consequence: '$80K start · faster civilian growth',
+        next: 'navy_22_construction'
+      }
+    ]
+  },
+
+  navy_22_late: {
+    type: 'story',
+    path: 'navy',
+    age: 22,
+    status: 'Late junior',
+    meta: 'Spring',
+    title: 'A year behind, ahead in other ways',
+    body: '<p>Junior at 22. You\'ll graduate at 23. The deployment shaped you. Most of your friends don\'t fully understand what you did, and you\'re okay with that.</p>',
+    income: 5500,
+    stats: [
+      { key: 'Rank', val: 'E-4 (PO3)' },
+      { key: 'School', val: 'Junior at 22' },
+      { key: 'Savings', val: '~$40K' }
+    ],
+    nextLabel: 'Push through →',
+    next: 'navy_23_late_graduate'
+  },
+
+  navy_23_late_graduate: {
+    type: 'story',
+    path: 'navy',
+    age: 23,
+    status: 'Just graduated',
+    meta: 'May',
+    title: 'Degree at 23',
+    body: '<p>Cap and gown. You\'re applying to SJPD and the deployment record opens doors. PO3, bachelor\'s, vet, clearance — strong profile.</p>',
+    income: 5500,
+    stats: [
+      { key: 'Rank', val: 'E-4' },
+      { key: 'Degree', val: 'Complete' },
+      { key: 'Status', val: 'SJPD applicant' }
+    ],
+    nextLabel: 'SJPD application →',
+    next: 'navy_23_sjpd_academy'
+  },
+
+  navy_22_sjpd: {
+    type: 'story',
+    path: 'navy',
+    age: 22,
+    status: 'SJPD academy',
+    meta: 'Fall',
+    title: 'Hired · academy begins',
+    body: '<p>SJPD called. Your background cleared fast because of your existing clearance. Academy starts in September. You\'re still drilling at the NOSC on weekends.</p>',
+    income: 118000,
+    stats: [
+      { key: 'Job', val: 'SJPD recruit' },
+      { key: 'Annual', val: '$118K' },
+      { key: 'Reserve', val: 'E-4' }
+    ],
+    nextLabel: 'Off the academy →',
+    next: 'navy_23_sjpd'
+  },
+
+  navy_22_construction: {
+    type: 'story',
+    path: 'navy',
+    age: 22,
+    status: 'PM track',
+    meta: 'Commercial construction',
+    title: 'Project Management role',
+    body: '<p>You took the construction route. PM I at a regional firm in San Jose. $80K base. Your military construction experience makes you faster than peers with civilian-only resumes.</p>',
+    income: 85000,
+    stats: [
+      { key: 'Role', val: 'Project Manager I' },
+      { key: 'Pay', val: '$80K + drill' },
+      { key: 'Reserve', val: 'E-4' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'navy_25_construction'
+  },
+
+  navy_23_sjpd_academy: {
+    type: 'story',
+    path: 'navy',
+    age: 23,
+    status: 'SJPD academy',
+    meta: 'Fall',
+    title: 'Hired at SJPD',
+    body: '<p>Academy at 23. A year late but a more developed applicant.</p>',
+    income: 118000,
+    stats: [
+      { key: 'Job', val: 'SJPD recruit' },
+      { key: 'Annual', val: '$118K' },
+      { key: 'Reserve', val: 'E-4' }
+    ],
+    nextLabel: 'Off academy →',
+    next: 'navy_24_sjpd'
+  },
+
+  navy_23_sjpd: {
+    type: 'story',
+    path: 'navy',
+    age: 23,
+    status: 'SJPD patrol',
+    meta: 'On the street',
+    title: 'Year one on patrol',
+    body: '<p>Out of the academy and on the road. FTO assigns you to a senior officer for the first three months. You drill the last weekend of every month. Two demanding careers, but you\'re 23 and the energy is there.</p>',
+    income: 142000,
+    stats: [
+      { key: 'SJPD', val: 'Step 1' },
+      { key: 'Reserve', val: 'E-5 promotable' },
+      { key: 'Total', val: '$142K' }
+    ],
+    nextLabel: 'Year passes →',
+    next: 'navy_25_sjpd'
+  },
+
+  navy_24_sjpd: {
+    type: 'story',
+    path: 'navy',
+    age: 24,
+    status: 'SJPD patrol',
+    meta: 'Year 2',
+    title: 'Off probation',
+    body: '<p>You finish probation. Specialty units are open: SWAT, K-9, motors. You promoted to E-5 (Petty Officer 2nd Class) in the Reserves.</p>',
+    income: 147000,
+    stats: [
+      { key: 'SJPD', val: 'Step 2' },
+      { key: 'Reserve', val: 'E-5 (PO2)' },
+      { key: 'Specialty', val: 'Eligible' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'navy_25_sjpd'
+  },
+
+  navy_25_construction: {
+    type: 'story',
+    path: 'navy',
+    age: 25,
+    status: 'Construction',
+    meta: 'PM II',
+    title: 'Project Manager II',
+    body: '<p>You promoted to PM II. Bigger projects, your own crews. $110K. Reserve drill on weekends. Steady.</p>',
+    income: 118000,
+    stats: [
+      { key: 'Role', val: 'PM II' },
+      { key: 'Pay', val: '$110K + drill' },
+      { key: 'Reserve', val: 'E-5' }
+    ],
+    nextLabel: 'Continue to 28 →',
+    next: 'navy_28_construction'
+  },
+
+  navy_25_sjpd: {
+    type: 'story',
+    path: 'navy',
+    age: 25,
+    status: 'SJPD senior',
+    meta: 'Three years sworn',
+    title: 'Test eligibility opens',
+    body: '<p>You can test for detective. Sergeant eligible in three more years. Reserve service is steady — E-5 with promotion to E-6 on the horizon.</p>',
+    income: 155000,
+    stats: [
+      { key: 'SJPD', val: 'Step 3-4' },
+      { key: 'Reserve', val: 'E-5 (PO2)' },
+      { key: 'Total', val: '$155K' }
+    ],
+    nextLabel: 'Years pass →',
+    next: 'navy_28_sjpd'
+  },
+
+  navy_28_sjpd: {
+    type: 'endpoint',
+    path: 'navy',
+    age: 28,
+    status: 'Complete · SJPD',
+    meta: 'You at 28',
+    title: 'Top-step SJPD + E-6 Navy Reserve',
+    summary: {
+      role: 'SJPD Police Officer · Step 7',
+      income: '$180,000 — $210,000',
+      rank: 'E-6 (PO1) · Navy Reserve',
+      degree: 'Bachelor\'s',
+      ceiling: 'Detective · sergeant test in 2 years'
+    },
+    reflection: '<p>The Blue Path delivered the same destination as Green, with a different culture along the way. <strong>Six years sworn at SJPD. Petty Officer 1st Class in the Navy Reserve.</strong> Your construction skills won\'t directly help you in police work, but the discipline did. You\'ve got Seabees who would still take a bullet for you.</p>'
+  },
+
+  navy_28_construction: {
+    type: 'endpoint',
+    path: 'navy',
+    age: 28,
+    status: 'Complete · Construction',
+    meta: 'You at 28',
+    title: 'Senior PM · construction industry',
+    summary: {
+      role: 'Senior PM · regional firm',
+      income: '$135,000 — $160,000',
+      rank: 'E-6 (PO1) · Navy Reserve',
+      degree: 'Bachelor\'s',
+      ceiling: 'Director of Construction by 35'
+    },
+    reflection: '<p>You took your military trade civilian. <strong>Senior PM at a commercial construction firm. PO1 in the Reserve.</strong> Less paycheck than SJPD, but more autonomy. You built two warehouses last year. You\'re the youngest senior PM at the firm.</p>'
+  },
+
+  // ============================================
+  // BRONZE PATH (ROTC RESERVE COMMISSION)
+  // ============================================
+  officer_18: {
+    type: 'story',
+    path: 'officer',
+    age: 18,
+    status: 'Freshman + ROTC',
+    meta: 'SJSU · year one',
+    title: 'Cadet life begins',
+    body: '<p>You\'re a full-time student. ROTC adds about 8 hours a week — Military Science class, leadership lab, PT three mornings a week. You contract with the GRFD (Guaranteed Reserve Forces Duty) scholarship, which locks in your commission as a Reserve officer at graduation.</p><p>You\'re reading Sun Tzu and running hills at 5 AM.</p>',
+    income: 0,
+    stats: [
+      { key: 'Status', val: 'MS-I Cadet' },
+      { key: 'School', val: 'Freshman' },
+      { key: 'Track', val: 'Reserve commission' }
+    ],
+    nextLabel: 'Sophomore year →',
+    next: 'officer_19'
+  },
+
+  officer_19: {
+    type: 'story',
+    path: 'officer',
+    age: 19,
+    status: 'Sophomore + ROTC',
+    meta: 'SJSU · year two',
+    title: 'Leadership lab intensifies',
+    body: '<p>MS-II. You\'re starting to lead — squad-level exercises, planning small training events. ROTC scholarship covers tuition. You spend the summer at CULP or some other ROTC summer program.</p>',
+    income: 0,
+    stats: [
+      { key: 'Status', val: 'MS-II Cadet' },
+      { key: 'School', val: 'Sophomore' },
+      { key: 'Scholarship', val: 'Full tuition' }
+    ],
+    nextLabel: 'Junior year →',
+    next: 'officer_20'
+  },
+
+  officer_20: {
+    type: 'choice',
+    path: 'officer',
+    age: 20,
+    status: 'Decision Point',
+    meta: 'Junior year · spring',
+    title: 'Active duty offer comes through.',
+    body: '<p>Your ROTC battalion commander pulls you aside. Your OML (Order of Merit List) ranking is high enough to compete for active duty. He wants to know: do you want to switch your contract from Reserve to Active?</p><p>Active duty means four years of full-time service after graduation. Higher ceiling. Federal LE later, defense contracting, the works. Reserve means you graduate, commission, and join the civilian workforce immediately.</p>',
+    choices: [
+      {
+        label: 'Stay Reserve',
+        title: 'Keep your original plan.',
+        detail: 'Commission as a Reserve officer at 22. Apply to SJPD. Drill one weekend a month as a 2LT/1LT/CPT while you build a civilian career.',
+        consequence: 'Same civilian timeline as Green/Blue · officer rank',
+        next: 'officer_21'
+      },
+      {
+        label: 'Switch to active duty',
+        title: 'Take the full commission.',
+        detail: 'Commission active. Branch and post determined by your OML ranking. Four years minimum. Civilian career delays to 26 at earliest.',
+        consequence: 'Active duty · federal/corporate ceiling',
+        next: 'officer_21_active'
+      }
+    ]
+  },
+
+  officer_21: {
+    type: 'story',
+    path: 'officer',
+    age: 21,
+    status: 'Junior · Advanced Camp',
+    meta: 'Summer · Fort Knox',
+    title: 'Advanced Camp',
+    body: '<p>You\'re an MS-III now. Summer between junior and senior year you spend at Cadet Summer Training (Advanced Camp) at Fort Knox. Five weeks of evaluation. Every cadet in the country goes through this. Your performance here partly determines your branch.</p><p>You earn $1,000 stipend per month as a junior cadet. Plus the scholarship.</p>',
+    income: 5000,
+    stats: [
+      { key: 'Status', val: 'MS-III' },
+      { key: 'Stipend', val: '$420/mo' },
+      { key: 'Track', val: 'Reserve commission' }
+    ],
+    nextLabel: 'Senior year →',
+    next: 'officer_22'
+  },
+
+  officer_21_active: {
+    type: 'story',
+    path: 'officer',
+    age: 21,
+    status: 'Active duty contract',
+    meta: 'New trajectory',
+    title: 'Active duty bound',
+    body: '<p>Your contract is rewritten. You\'re tracking for active duty. Advanced Camp at Fort Knox in the summer. Your performance there will help determine your branch — Infantry, Armor, Aviation, Intelligence, you pick from what\'s available based on OML.</p>',
+    income: 5000,
+    stats: [
+      { key: 'Status', val: 'MS-III · Active track' },
+      { key: 'Stipend', val: '$420/mo' },
+      { key: 'Branch', val: 'TBD at AC' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'officer_22_active'
+  },
+
+  officer_22: {
+    type: 'story',
+    path: 'officer',
+    age: 22,
+    status: 'Commission · SJPD',
+    meta: 'May · graduation',
+    title: 'Commissioned. Hired. Started.',
+    body: '<p>You commission as a 2nd Lieutenant in the Army Reserve at your SJSU graduation ceremony. Your father pins the bars on. That night you submit your SJPD application — your background investigation is half-done already because of the ROTC clearance.</p><p>SJPD academy starts in September. You\'re a 2LT and an SJPD recruit at the same time. Drill weekends are now spent leading 30+ soldiers as a platoon leader.</p>',
+    income: 118500,
+    stats: [
+      { key: 'Rank', val: '2LT (O-1)' },
+      { key: 'Civilian', val: 'SJPD recruit' },
+      { key: 'Annual', val: '$118.5K' }
+    ],
+    nextLabel: 'Off the academy →',
+    next: 'officer_23'
+  },
+
+  officer_22_active: {
+    type: 'story',
+    path: 'officer',
+    age: 22,
+    status: 'Active duty',
+    meta: 'BOLC',
+    title: '2LT · active duty',
+    body: '<p>You commission active. Branch Officer Leader Course (BOLC) at whatever post your branch trains at — Fort Moore for Infantry, Fort Benning area in general. Then you ship to your first duty station.</p><p>Total comp including BAH: ~$80K. You\'re leading a platoon at 22.</p>',
+    income: 80000,
+    stats: [
+      { key: 'Rank', val: '2LT (O-1)' },
+      { key: 'Status', val: 'Active duty' },
+      { key: 'Total comp', val: '~$80K' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'officer_25_active'
+  },
+
+  officer_23: {
+    type: 'story',
+    path: 'officer',
+    age: 23,
+    status: 'SJPD + 2LT',
+    meta: 'Year one on the street',
+    title: 'Two careers, in parallel',
+    body: '<p>Off the SJPD academy. Patrol officer on weekdays, 2LT in the Reserves on monthly drill weekends. Most cops don\'t have a second career; you do, and it\'s a leadership role.</p>',
+    income: 142500,
+    stats: [
+      { key: 'SJPD', val: 'Step 1 · $137K' },
+      { key: 'Reserve', val: '2LT drill' },
+      { key: 'Total', val: '$142.5K' }
+    ],
+    nextLabel: 'Promotion year →',
+    next: 'officer_25'
+  },
+
+  officer_25: {
+    type: 'story',
+    path: 'officer',
+    age: 25,
+    status: 'SJPD + Captain',
+    meta: 'Promotion to O-3',
+    title: 'Captain in the Reserve. Senior officer at SJPD.',
+    body: '<p>You promote to Captain (O-3) in the Reserve. You command a company on drill weekends — 100+ soldiers. You\'re also a 3-year SJPD officer with specialty unit eligibility.</p><p>Some of the soldiers who report to you are E-5 sergeants in their thirties. They salute you. It\'s strange and it\'s normal.</p>',
+    income: 158000,
+    stats: [
+      { key: 'SJPD', val: 'Step 4' },
+      { key: 'Reserve', val: 'CPT (O-3)' },
+      { key: 'Total', val: '$158K' }
+    ],
+    nextLabel: 'Continue to 28 →',
+    next: 'officer_28'
+  },
+
+  officer_25_active: {
+    type: 'story',
+    path: 'officer',
+    age: 25,
+    status: 'Active CPT',
+    meta: 'Mid-career active',
+    title: 'Captain · company commander',
+    body: '<p>Three years active duty in. Promoted to Captain. Commanding a 120-person company. Total comp around $130K with BAH/BAS.</p><p>You\'re considering whether to stay in or separate at the end of your 4-year obligation next year.</p>',
+    income: 130000,
+    stats: [
+      { key: 'Rank', val: 'CPT (O-3)' },
+      { key: 'Role', val: 'Company commander' },
+      { key: 'Total comp', val: '$130K' }
+    ],
+    nextLabel: 'Continue →',
+    next: 'officer_28_active'
+  },
+
+  officer_28: {
+    type: 'endpoint',
+    path: 'officer',
+    age: 28,
+    status: 'Complete · Reserve officer',
+    meta: 'You at 28',
+    title: 'Top-step SJPD officer + Reserve Captain',
+    summary: {
+      role: 'SJPD Police Officer · Step 7',
+      income: '$188,000 — $218,000',
+      rank: 'CPT (O-3) · Army Reserve',
+      degree: 'Bachelor\'s · 6 years ago',
+      ceiling: 'Federal LE preferred · sergeant track at SJPD · or pivot to corporate'
+    },
+    reflection: '<p>You ran the longest path and arrived at the same civilian destination, with more in your hand. <strong>Six years sworn at SJPD. Captain in the Army Reserve.</strong> Same paycheck as your Green and Blue counterparts, plus officer drill pay (~$8K/yr on top), plus federal LE doors wide open, plus the leadership credential that almost no 28-year-old has.</p><p>The four-year tradeoff bought you the highest-ceiling version of this life.</p>'
+  },
+
+  officer_28_active: {
+    type: 'endpoint',
+    path: 'officer',
+    age: 28,
+    status: 'Complete · Separated CPT',
+    meta: 'You at 28',
+    title: 'Separating Captain · choose your exit',
+    summary: {
+      role: 'Captain (O-3) · separating',
+      income: '$141K active → $150-250K civilian',
+      rank: 'CPT (O-3) · transitioning',
+      degree: 'Bachelor\'s',
+      ceiling: 'FBI · defense contracting · corporate · PD with hiring preference'
+    },
+    reflection: '<p>You went the full active duty route. Six years in uniform, the last three as a Captain. <strong>You\'re separating with a clearance, command experience, and every door open.</strong></p><p>Federal LE agencies are recruiting you. Defense contractors are offering $180-220K. Corporate security roles want former officers. And if you decide you still want to be a cop, SJPD will hire you on the spot — at the top of the applicant pool. The four-year civilian-career delay is real. The optionality is bigger.</p>'
+  }
+
+};
+
+/* ---------- ANALYZE MODE DATA: chart points ---------- */
+const chartData = {
+  // Income trajectory per path, age 18 → 28
+  army:    [5500, 4500, 5000, 5000, 113500, 142000, 147000, 150000, 160000, 170000, 195000],
+  navy:    [7000, 4500, 5000, 5000, 113500, 142000, 147000, 150000, 160000, 170000, 195000],
+  officer: [0,    0,    5000, 5000, 118500, 142500, 147000, 158000, 165000, 175000, 200000]
+};
+
+/* ---------- STATE ---------- */
+const state = {
+  current: 'start',
+  history: [],
+  cumulative: 0,
+  path: null,
+  mode: 'simulate'
+};
+
+/* ---------- DOM REFS ---------- */
+const $ = id => document.getElementById(id);
+
+const refs = {
+  hud: $('hud'),
+  hudAge: $('hudAge'),
+  hudStatus: $('hudStatus'),
+  hudPath: $('hudPath'),
+  hudIncome: $('hudIncome'),
+  hudCumulative: $('hudCumulative'),
+  pathStrip: $('pathStrip'),
+  scene: $('scene'),
+  choices: $('choices'),
+  simControls: $('simControls'),
+  btnRestart: $('btnRestart'),
+  btnShare: $('btnShare'),
+  btnBack: $('btnBack'),
+  shareModal: $('shareModal'),
+  shareClose: $('shareClose'),
+  shareText: $('shareText'),
+  copySummary: $('copySummary'),
+  btnSimulate: $('btnSimulate'),
+  btnAnalyze: $('btnAnalyze'),
+  modeSimulate: $('modeSimulate'),
+  modeAnalyze: $('modeAnalyze'),
+  tickerTrack: $('tickerTrack'),
+  termTime: $('termTime'),
+  ageAxis: $('ageAxis'),
+  lineArmy: $('lineArmy'),
+  lineNavy: $('lineNavy'),
+  lineOfficer: $('lineOfficer'),
+  dotsArmy: $('dotsArmy'),
+  dotsNavy: $('dotsNavy'),
+  dotsOfficer: $('dotsOfficer'),
+  endLabels: $('endLabels')
+};
+
+/* ---------- HELPERS ---------- */
+function fmtMoney(n) {
+  if (n === 0) return '$0';
+  if (n >= 1000) return '$' + (n/1000).toFixed(n >= 100000 ? 0 : 1).replace('.0','') + 'K';
+  return '$' + n;
+}
+
+function fmtCumulative(n) {
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+  if (n >= 1000) return '$' + Math.round(n/1000) + 'K';
+  return '$' + n;
+}
+
+/* Count-up animation for money values (visual only — state is untouched) */
+const moneyPrev = { income: 0, cumulative: 0 };
+function animateMoney(el, from, to, fmt) {
+  if (from === to || typeof requestAnimationFrame === 'undefined') { el.textContent = fmt(to); return; }
+  const dur = 600;
+  const t0 = performance.now();
+  function tick(t) {
+    const p = Math.min((t - t0) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(Math.round(from + (to - from) * eased));
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------- PATH STRIP (11 segments, one per year 18-28) ---------- */
+function renderPathStrip() {
+  refs.pathStrip.innerHTML = '';
+  const visitedAges = new Set();
+  state.history.forEach(nodeId => {
+    const node = nodes[nodeId];
+    if (node && node.age >= 18) visitedAges.add(node.age);
+  });
+  const currentNode = nodes[state.current];
+  const currentAge = currentNode ? currentNode.age : null;
+
+  for (let age = 18; age <= 28; age++) {
+    const seg = document.createElement('div');
+    seg.className = 'path-strip-segment';
+    if (visitedAges.has(age) && state.path) {
+      seg.classList.add('filled', state.path);
+    }
+    if (age === currentAge) seg.classList.add('current');
+    refs.pathStrip.appendChild(seg);
+  }
+}
+
+/* ---------- HUD ---------- */
+function renderHud() {
+  const node = nodes[state.current];
+  if (!node) return;
+
+  refs.hudAge.textContent = node.age || 17;
+  refs.hudStatus.textContent = node.status || node.meta || '—';
+  refs.hudPath.textContent = state.path
+    ? state.path === 'army' ? 'Green' : state.path === 'navy' ? 'Blue' : 'Bronze'
+    : '—';
+  const inc = node.income !== undefined ? node.income : 0;
+  animateMoney(refs.hudIncome, moneyPrev.income, inc, fmtMoney);
+  animateMoney(refs.hudCumulative, moneyPrev.cumulative, state.cumulative, fmtCumulative);
+  moneyPrev.income = inc;
+  moneyPrev.cumulative = state.cumulative;
+}
+
+/* ---------- SCENE RENDER ---------- */
+function renderScene() {
+  const node = nodes[state.current];
+  if (!node) return;
+
+  // Build scene HTML
+  let html = '';
+
+  if (node.type === 'endpoint') {
+    // Endpoint summary card
+    html = `
+      <div class="summary-card ${state.path}">
+        <div class="summary-title">${node.title}</div>
+        <div class="summary-sub">${node.meta}</div>
+        <div class="summary-grid">
+          <div class="summary-stat">
+            <div class="label">Civilian role</div>
+            <div class="value">${node.summary.role.split('·')[0].trim()}</div>
+            <div class="extra">${node.summary.role.split('·').slice(1).join('·').trim() || ''}</div>
+          </div>
+          <div class="summary-stat">
+            <div class="label">Annual income</div>
+            <div class="value">${node.summary.income}</div>
+            <div class="extra">at age 28</div>
+          </div>
+          <div class="summary-stat">
+            <div class="label">Military rank</div>
+            <div class="value">${node.summary.rank.split('·')[0].trim()}</div>
+            <div class="extra">${node.summary.rank.split('·').slice(1).join('·').trim() || ''}</div>
+          </div>
+          <div class="summary-stat">
+            <div class="label">Career ceiling</div>
+            <div class="value" style="font-size: 15px;">${node.summary.ceiling}</div>
+          </div>
+        </div>
+        <div class="summary-reflection">${node.reflection}</div>
+      </div>
+    `;
+  } else {
+    // Standard scene card
+    const sceneClass = node.path || '';
+    html = `
+      <div class="scene ${sceneClass}">
+        <div class="scene-meta">${node.meta || ''}</div>
+        <div class="scene-title">${node.title}</div>
+        <div class="scene-body">${node.body || ''}</div>
+        ${node.stats ? `
+          <div class="scene-stats">
+            ${node.stats.map(s => `
+              <div class="scene-stat">
+                <span class="key">${s.key}</span>
+                <span class="val">${s.val}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  refs.scene.outerHTML = `<div id="scene">${html}</div>`;
+  refs.scene = $('scene');
+}
+
+/* ---------- CHOICES RENDER ---------- */
+function renderChoices() {
+  const node = nodes[state.current];
+  if (!node) return;
+
+  const promptEl = $('choicesPrompt');
+  const promptLabel = promptEl ? promptEl.querySelector('.prompt-label') : null;
+  const promptHint = promptEl ? promptEl.querySelector('.prompt-hint') : null;
+
+  let html = '';
+  let containerClass = 'choices';
+
+  if (node.type === 'endpoint') {
+    // No choices, hide the prompt and clear the choices area
+    refs.choices.innerHTML = '';
+    refs.choices.className = 'choices';
+    if (promptEl) promptEl.style.display = 'none';
+    return;
+  }
+
+  if (node.type === 'start') {
+    containerClass = 'choices start';
+    if (promptEl) {
+      promptEl.style.display = 'flex';
+      promptLabel.textContent = 'Choose your path';
+      promptHint.textContent = 'Tap a card to begin';
+    }
+    html = node.choices.map(c => `
+      <button class="choice ${c.path}" data-next="${c.next}" data-path="${c.path}" data-income="0">
+        <div class="choice-label">${c.label}</div>
+        <div class="choice-title">${c.title}</div>
+        <div class="choice-detail">
+          ${c.detail}
+          <span class="consequence">${c.consequence}</span>
+        </div>
+      </button>
+    `).join('');
+  } else if (node.type === 'choice') {
+    containerClass = 'choices binary';
+    if (promptEl) {
+      promptEl.style.display = 'flex';
+      promptLabel.textContent = "What's your move?";
+      promptHint.textContent = 'Tap a card to choose';
+    }
+    html = node.choices.map(c => `
+      <button class="choice ${state.path}" data-next="${c.next}">
+        <div class="choice-label">${c.label}</div>
+        <div class="choice-title">${c.title}</div>
+        <div class="choice-detail">
+          ${c.detail}
+          <span class="consequence">${c.consequence}</span>
+        </div>
+      </button>
+    `).join('');
+  } else if (node.type === 'story') {
+    containerClass = 'choices continue';
+    // Story nodes only have a "continue" button — no prompt needed
+    if (promptEl) promptEl.style.display = 'none';
+    html = `
+      <button class="choice ${state.path}" data-next="${node.next}">
+        <div class="choice-label">Continue</div>
+        <div class="choice-title">${(node.nextLabel || 'Continue').replace(/\s*→\s*$/, '')}</div>
+      </button>
+    `;
+  }
+
+  refs.choices.innerHTML = html;
+  refs.choices.className = containerClass;
+
+  // Wire up choice clicks
+  refs.choices.querySelectorAll('.choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nextId = btn.dataset.next;
+      const pickedPath = btn.dataset.path;
+      if (pickedPath) state.path = pickedPath;
+      makeChoice(nextId);
+    });
+  });
+}
+
+/* ---------- STATE TRANSITIONS ---------- */
+function makeChoice(nextId) {
+  state.history.push(state.current);
+  state.current = nextId;
+  const nextNode = nodes[nextId];
+  if (nextNode && nextNode.income) {
+    state.cumulative += nextNode.income;
+  }
+  render();
+  // Scroll the scene into view
+  setTimeout(() => {
+    const sceneEl = $('scene');
+    if (sceneEl) sceneEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+function restartSim() {
+  state.current = 'start';
+  state.history = [];
+  state.cumulative = 0;
+  state.path = null;
+  render();
+}
+
+function goBack() {
+  if (state.history.length === 0) return;
+
+  // Subtract the income of the node we're leaving
+  const leaving = nodes[state.current];
+  if (leaving && leaving.income) {
+    state.cumulative -= leaving.income;
+  }
+
+  // Pop the previous node off history and make it current
+  state.current = state.history.pop();
+
+  // If we've returned to 'start', clear path
+  if (state.current === 'start') {
+    state.path = null;
+  }
+
+  render();
+  setTimeout(() => {
+    const sceneEl = $('scene');
+    if (sceneEl) sceneEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+/* ---------- MAIN RENDER ---------- */
+function render() {
+  renderHud();
+  renderPathStrip();
+  renderScene();
+  renderChoices();
+  updateShareControls();
+
+  // Show restart button if past start
+  if (state.current !== 'start') {
+    refs.simControls.style.display = 'flex';
+  } else {
+    refs.simControls.style.display = 'none';
+  }
+}
+
+/* ---------- ANALYZE MODE ---------- */
+function renderChart() {
+  const ages = [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
+  const xStart = 80;
+  const xEnd = 860;
+  const yTop = 40;
+  const yBottom = 280;
+  const maxIncome = 220000;
+
+  // Build x positions
+  const xPositions = ages.map((_, i) => xStart + (i / (ages.length - 1)) * (xEnd - xStart));
+
+  // Y for income
+  const yFor = inc => yBottom - (inc / maxIncome) * (yBottom - yTop);
+
+  // Axis labels
+  refs.ageAxis.innerHTML = ages.map((age, i) => `
+    <text x="${xPositions[i]}" y="300" text-anchor="middle"
+          font-family="JetBrains Mono, monospace" font-size="10"
+          fill="${age % 2 === 0 ? '#a8b0bb' : '#69727e'}">${age}</text>
+  `).join('');
+
+  // Build path lines
+  const buildPath = (data) => {
+    return data.map((inc, i) => `${i === 0 ? 'M' : 'L'} ${xPositions[i]} ${yFor(inc)}`).join(' ');
+  };
+
+  refs.lineArmy.setAttribute('d', buildPath(chartData.army));
+  refs.lineNavy.setAttribute('d', buildPath(chartData.navy));
+  refs.lineOfficer.setAttribute('d', buildPath(chartData.officer));
+
+  // Build dots
+  const buildDots = (data, color) => {
+    return data.map((inc, i) => `
+      <circle cx="${xPositions[i]}" cy="${yFor(inc)}" r="3.5"
+              fill="${color}" stroke="#0b0e13" stroke-width="2">
+        <title>Age ${ages[i]}: ${fmtMoney(inc)}</title>
+      </circle>
+    `).join('');
+  };
+
+  refs.dotsArmy.innerHTML = buildDots(chartData.army, '#4ade80');
+  refs.dotsNavy.innerHTML = buildDots(chartData.navy, '#38bdf8');
+  refs.dotsOfficer.innerHTML = buildDots(chartData.officer, '#f0b429');
+
+  // End labels at age 28
+  const lastIdx = ages.length - 1;
+  refs.endLabels.innerHTML = `
+    <text x="${xPositions[lastIdx] + 12}" y="${yFor(chartData.officer[lastIdx]) - 4}"
+          font-family="JetBrains Mono, monospace" font-size="9" fill="#f0b429" font-weight="700">$200K</text>
+    <text x="${xPositions[lastIdx] + 12}" y="${yFor(chartData.army[lastIdx]) + 4}"
+          font-family="JetBrains Mono, monospace" font-size="9" fill="#4ade80" font-weight="700">$195K</text>
+  `;
+}
+
+function renderTicker() {
+  // Repeat the entries twice for seamless scroll
+  const entries = [
+    { sym: 'GRN.SJPD', val: '$195K', delta: '+7.2%' },
+    { sym: 'BLU.SJPD', val: '$195K', delta: '+7.2%' },
+    { sym: 'BRZ.O3', val: '$200K', delta: '+9.1%' },
+    { sym: 'GRN.RNK', val: 'E-6', delta: '6Y SVC' },
+    { sym: 'BLU.RNK', val: 'E-6', delta: '6Y SVC' },
+    { sym: 'BRZ.RNK', val: 'O-3', delta: '6Y SVC' },
+    { sym: 'GRN.OPT', val: '60%', delta: '↑' },
+    { sym: 'BLU.OPT', val: '60%', delta: '↑' },
+    { sym: 'BRZ.OPT', val: '92%', delta: '↑↑' },
+    { sym: 'CLEAR', val: 'SECRET', delta: 'ALL PATHS' },
+    { sym: 'DEGREE', val: 'BA', delta: 'BY 22' },
+    { sym: 'FED.LE', val: 'STRONG', delta: 'BRZ PREF' }
+  ];
+
+  const buildEntry = e => {
+    const path = e.sym.startsWith('GRN') ? 'army' : e.sym.startsWith('BLU') ? 'navy' : e.sym.startsWith('BRZ') ? 'officer' : '';
+    return `<span class="tick-entry">
+      <span class="tick-symbol ${path}">${e.sym}</span>
+      <span class="tick-val">${e.val}</span>
+      <span class="tick-delta">${e.delta}</span>
+    </span>`;
+  };
+
+  refs.tickerTrack.innerHTML = [...entries, ...entries].map(buildEntry).join('');
+}
+
+function updateTermTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  refs.termTime.textContent = `${h}:${m}:${s} PST`;
+}
+
+/* ---------- MODE SWITCHING ---------- */
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+
+  if (mode === 'simulate') {
+    refs.modeSimulate.classList.add('active');
+  } else {
+    refs.modeAnalyze.classList.add('active');
+    renderChart();
+    renderTicker();
+  }
+}
+
+/* ---------- SHARE STATE ---------- */
+
+// decodeHistory is retained so that any pre-existing replay links from earlier
+// versions still work — they load and replay the path silently.
+function decodeHistory(hash) {
+  if (!hash || !hash.startsWith('#play=')) return null;
+  const encoded = hash.substring(6);
+  const ids = encoded.split('.');
+  if (ids.some(id => !nodes[id])) return null;
+  return ids;
+}
+
+function buildSummaryText() {
+  const node = nodes[state.current];
+  if (!node || node.type !== 'endpoint') return '';
+
+  const pathName = state.path === 'army' ? 'The Green Path (Army Reserve)'
+                 : state.path === 'navy' ? 'The Blue Path (Navy Reserve)'
+                 : 'The Bronze Path (ROTC Officer)';
+
+  // Build a choice trail
+  const choiceTrail = [];
+  state.history.forEach((nodeId, i) => {
+    const n = nodes[nodeId];
+    if (n && n.type === 'choice') {
+      const nextId = state.history[i + 1] || state.current;
+      const chosen = n.choices.find(c => c.next === nextId);
+      if (chosen) {
+        choiceTrail.push(`  Age ${n.age}: ${chosen.title.replace(/\.$/, '')}`);
+      }
+    }
+  });
+
+  const lines = [
+    `THREE PATHS — Simulation Result`,
+    `═══════════════════════════════`,
+    ``,
+    `Path: ${pathName}`,
+    `Outcome: ${node.title}`,
+    ``,
+    `At age 28:`,
+    `  Role:   ${node.summary.role}`,
+    `  Income: ${node.summary.income}`,
+    `  Rank:   ${node.summary.rank}`,
+    `  Ceiling: ${node.summary.ceiling}`,
+    ``,
+    `Total earnings 18-28: ${fmtCumulative(state.cumulative)}`,
+    ``,
+  ];
+
+  if (choiceTrail.length > 0) {
+    lines.push(`Decisions made along the way:`);
+    lines.push(...choiceTrail);
+  }
+
+  return lines.join('\n');
+}
+
+function openShareModal() {
+  refs.shareText.value = buildSummaryText();
+  refs.shareModal.style.display = 'flex';
+}
+
+function closeShareModal() {
+  refs.shareModal.style.display = 'none';
+}
+
+function copyToClipboard(text, button) {
+  const showCopied = () => {
+    const original = button.textContent;
+    button.textContent = '✓ Copied';
+    button.classList.add('copied');
+    setTimeout(() => {
+      button.textContent = original;
+      button.classList.remove('copied');
+    }, 1500);
+  };
+  const showFallback = () => {
+    button.textContent = 'Select text above & copy manually';
+    setTimeout(() => {
+      button.textContent = 'Copy to clipboard';
+    }, 2500);
+  };
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(showFallback);
+    } else {
+      // No clipboard API — prompt user to select manually
+      showFallback();
+    }
+  } catch (e) {
+    showFallback();
+  }
+}
+
+// Load state from URL hash if present (for backwards compat with old replay links)
+function loadFromHash() {
+  try {
+    const ids = decodeHistory(window.location.hash);
+    if (!ids) return false;
+
+    state.history = ids.slice(0, -1);
+    state.current = ids[ids.length - 1];
+    state.cumulative = 0;
+    state.path = null;
+
+    // Find path from first non-start node
+    for (const id of ids) {
+      const n = nodes[id];
+      if (n && n.path) {
+        state.path = n.path;
+        break;
+      }
+    }
+
+    // Accumulate income from all visited nodes
+    ids.forEach(id => {
+      const n = nodes[id];
+      if (n && n.income) state.cumulative += n.income;
+    });
+
+    return true;
+  } catch (e) {
+    // If anything fails reading the URL, just start fresh
+    return false;
+  }
+}
+
+// Update controls visibility based on state
+function updateShareControls() {
+  const node = nodes[state.current];
+  const isEndpoint = node && node.type === 'endpoint';
+  const hasHistory = state.history.length > 0;
+
+  refs.btnShare.style.display = isEndpoint ? '' : 'none';
+  refs.btnBack.style.display = hasHistory ? '' : 'none';
+}
+
+/* ---------- WIRE UP ---------- */
+refs.btnSimulate.addEventListener('click', () => setMode('simulate'));
+refs.btnAnalyze.addEventListener('click', () => setMode('analyze'));
+refs.btnRestart.addEventListener('click', () => {
+  // Try to clear any hash from old shared replay links — non-essential, ignore errors
+  try {
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    } else if (window.location.hash) {
+      window.location.hash = '';
+    }
+  } catch (e) {
+    // Some embedded contexts (sandboxed iframes, content blockers) restrict history API.
+    // Restart still works — we just can't clean the URL.
+  }
+  restartSim();
+});
+
+refs.btnShare.addEventListener('click', openShareModal);
+refs.btnBack.addEventListener('click', goBack);
+refs.shareClose.addEventListener('click', closeShareModal);
+refs.shareModal.addEventListener('click', (e) => {
+  if (e.target === refs.shareModal) closeShareModal();
+});
+
+refs.copySummary.addEventListener('click', () => copyToClipboard(refs.shareText.value, refs.copySummary));
+
+// Keyboard: ESC closes modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && refs.shareModal.style.display !== 'none') closeShareModal();
+});
+
+/* ---------- INIT ---------- */
+// Try loading from URL first (preserves backwards compatibility with old shared links)
+loadFromHash();
+
+render();
+renderChart();
+renderTicker();
+updateTermTime();
+setInterval(updateTermTime, 1000);
+</script>
+
+</body>
+</html>
